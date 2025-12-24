@@ -1,7 +1,6 @@
 import crypto from "crypto";
 
 const ALLOWED_EMAIL = "202510576@gordoncollege.edu.ph";
-const ALLOWED_STAGES = ["songs", "questions", "game"];
 
 function base64urlToString(b64url) {
   const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
@@ -10,7 +9,10 @@ function base64urlToString(b64url) {
 }
 
 function sign(data, secret) {
-  return crypto.createHmac("sha256", secret).update(data).digest("base64url");
+  return crypto
+    .createHmac("sha256", secret)
+    .update(data)
+    .digest("base64url");
 }
 
 export default function handler(req, res) {
@@ -20,35 +22,40 @@ export default function handler(req, res) {
   }
 
   const token = String(req.query.token || "");
-  const [payload, sig] = token.split(".");
-
-  if (!payload || !sig) {
-    return res.status(403).json({ ok: false, reason: "invalid_token" });
+  if (!token.includes(".")) {
+    return res.status(403).json({ ok: false, reason: "bad_token" });
   }
 
+  const [payload, sig] = token.split(".");
   const expected = sign(payload, TOKEN_SECRET);
+
   if (sig !== expected) {
-    return res.status(403).json({ ok: false, reason: "bad_signature" });
+    return res.status(403).json({ ok: false, reason: "invalid_signature" });
   }
 
   let payloadObj;
   try {
     payloadObj = JSON.parse(base64urlToString(payload));
   } catch {
-    return res.status(403).json({ ok: false, reason: "bad_payload" });
+    return res.status(403).json({ ok: false, reason: "invalid_payload" });
   }
 
   const now = Math.floor(Date.now() / 1000);
-  if (!payloadObj?.exp || now > payloadObj.exp) {
+  if (!payloadObj.exp || now > payloadObj.exp) {
     return res.status(403).json({ ok: false, reason: "expired" });
   }
 
-  if (String(payloadObj.email || "").toLowerCase() !== ALLOWED_EMAIL) {
+  if (
+    String(payloadObj.email || "").toLowerCase() !== ALLOWED_EMAIL
+  ) {
     return res.status(403).json({ ok: false, reason: "email_denied" });
   }
 
-  const stage = String(payloadObj.stage || "");
-  if (!ALLOWED_STAGES.includes(stage)) {
+
+  const allowedStages = ["continue", "questions"];
+  const stage = payloadObj.stage || "continue";
+
+  if (!allowedStages.includes(stage)) {
     return res.status(403).json({ ok: false, reason: "stage_denied" });
   }
 
