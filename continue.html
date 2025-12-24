@@ -13,9 +13,12 @@
     <div id="vignette"></div>
   </div>
 
-  <header id="hud" class="hud hidden">
-    <div class="hearts" id="heartsBar"></div>
-  </header>
+  <div id="hearts" class="hearts">
+    <img src="/assets/heart.svg" class="heart" alt="heart">
+    <img src="/assets/heart.svg" class="heart" alt="heart">
+    <img src="/assets/heart.svg" class="heart" alt="heart">
+  </div>
+
 
   <main class="app">
     <section id="blocked" class="card hidden">
@@ -120,16 +123,25 @@
         <div id="grid" class="grid"></div>
         <div id="finalMsg" class="msg"></div>
 
-        <div id="photoStage" class="photoStage hidden">
-          <div id="photoCard" class="photoCard">
-            <div class="photoFront">OUR PHOTO</div>
-            <div class="photoBack">
-              <canvas id="scratch" width="680" height="260"></canvas>
-              <div class="scratchHint">Scratch / click to reveal</div>
-              <div id="revealText" class="revealText hidden">YES.</div>
+        <div id="photoStage" class="hidden">
+          <div id="photoCard" class="photo-card">
+
+            <div class="card-front">
+              <canvas id="scratch" width="360" height="240"></canvas>
             </div>
+
+            <div class="card-back">
+              <img
+                src="/assets/20251206_190038.jpg"
+                alt="Us"
+                class="photo-img"
+              />
+              <div id="revealText" class="hidden">
+                My answer is yes.
+              </div>
+            </div>
+
           </div>
-          <button id="restart" class="btn ghost">Restart</button>
         </div>
       </div>
     </section>
