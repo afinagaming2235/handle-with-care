@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>continue</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <div id="bg">
+    <div id="fog"></div>
+    <div id="noise"></div>
+    <div id="vignette"></div>
+  </div>
+
+  <header id="hud" class="hud hidden">
+    <div class="hearts" id="heartsBar"></div>
+  </header>
+
+  <main class="app">
+    <section id="blocked" class="card hidden">
+      <div class="stack">
+        <p class="title">Access denied.</p>
+        <p class="subtitle">This page only opens from the email link.</p>
+      </div>
+    </section>
+
+    <section id="personal" class="card hidden">
+      <div class="stack wide">
+        <p class="title">If you really know me…</p>
+
+        <div class="qblock">
+          <p class="subtitle">Question 1</p>
+          <p class="question">Type the correct answer.</p>
+          <input id="p1" class="input" placeholder="answer" autocomplete="off" />
+          <div id="p1Msg" class="msg"></div>
+        </div>
+
+        <div class="qblock">
+          <p class="subtitle">Question 2</p>
+          <p class="question">Type the correct answer.</p>
+          <input id="p2" class="input" placeholder="answer" autocomplete="off" />
+          <div id="p2Msg" class="msg"></div>
+        </div>
+
+        <button id="personalBtn" class="btn glow">Continue</button>
+        <div id="personalMsg" class="msg"></div>
+      </div>
+    </section>
+
+    <section id="mainQuestions" class="card hidden">
+      <div class="stack wide">
+        <p class="title">From here on, every choice matters.</p>
+        <p id="mqPrompt" class="question big"></p>
+        <div id="mqChoices" class="choices"></div>
+        <div id="mqMsg" class="msg"></div>
+      </div>
+    </section>
+
+    <section id="afterMain" class="card hidden">
+      <div class="stack wide">
+        <p class="title" id="afterMainTitle"></p>
+        <p class="subtitle" id="afterMainBody"></p>
+        <button id="toGameBtn" class="btn glow hidden">Continue</button>
+      </div>
+    </section>
+
+    <section id="game" class="card hidden">
+      <div class="stack wide">
+        <p class="title">Steady Hand.</p>
+        <p class="subtitle">Hard. Unforgiving. Slow wins.</p>
+
+        <div class="panel">
+          <canvas id="steadyCanvas" width="820" height="340"></canvas>
+        </div>
+
+        <div class="row">
+          <button id="gameStart" class="btn ghost">Start</button>
+          <button id="gameReset" class="btn ghost">Reset</button>
+          <div id="gameMsg" class="msg inline"></div>
+        </div>
+
+        <p class="note">Touching outside the safe path breaks a heart.</p>
+      </div>
+    </section>
+
+
+    <section id="afterGame" class="card hidden">
+      <div class="stack wide">
+        <p class="title" id="afterGameTitle"></p>
+        <p class="subtitle" id="afterGameBody"></p>
+        <button id="toScrollBtn" class="btn glow hidden">Continue</button>
+      </div>
+    </section>
+
+    <section id="scroll" class="card hidden">
+      <div class="stack wide">
+        <p class="title">Some answers are written, but not yet opened.</p>
+
+        <button id="openScroll" class="scrollBtn" aria-label="Open scroll">
+          <span class="scrollClosed"></span>
+        </button>
+
+        <div id="letterWrap" class="scrollOpen hidden">
+          <div class="paper">
+            <div id="letter" class="letter"></div>
+          </div>
+        </div>
+
+        <button id="toFinalBtn" class="btn glow hidden">Continue</button>
+      </div>
+    </section>
+
+
+    <section id="final" class="card hidden">
+      <div class="stack wide">
+        <p class="title" id="finalTitle">Final.</p>
+        <p class="subtitle" id="finalSub"></p>
+
+        <div id="grid" class="grid"></div>
+        <div id="finalMsg" class="msg"></div>
+
+        <div id="photoStage" class="photoStage hidden">
+          <div id="photoCard" class="photoCard">
+            <div class="photoFront">OUR PHOTO</div>
+            <div class="photoBack">
+              <canvas id="scratch" width="680" height="260"></canvas>
+              <div class="scratchHint">Scratch / click to reveal</div>
+              <div id="revealText" class="revealText hidden">YES.</div>
+            </div>
+          </div>
+          <button id="restart" class="btn ghost">Restart</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./js/continue.js"></script>
+</body>
+</html>

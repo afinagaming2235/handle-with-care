@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>hm</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="bg">
+    <div id="fog"></div>
+    <div id="noise"></div>
+    <div id="vignette"></div>
+  </div>
+
+  <main class="app">
+    <section class="card">
+      <div class="stack">
+        <p class="title">This is not for everyone.</p>
+        <p class="subtitle">If this is meant for you, say your name.</p>
+
+        <input id="nameInput" class="input" placeholder="name" autocomplete="off" />
+        <div id="nameMsg" class="msg"></div>
+
+        <p class="subtitle">Enter your email.</p>
+        <input id="emailInput" class="input" placeholder="email" autocomplete="off" />
+        <div id="emailMsg" class="msg"></div>
+
+        <button id="sendBtn" class="btn glow" type="button">Send me the link</button>
+        <div id="sendMsg" class="msg"></div>
+
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/js/landing.js"></script>
+</body>
+</html>
