@@ -2,10 +2,10 @@ import nodemailer from "nodemailer";
 import crypto from "crypto";
 
 const ALLOWED_EMAIL = "202510576@gordoncollege.edu.ph";
-const TOKEN_TTL_SECONDS = 60 * 60;
+const TOKEN_TTL_SECONDS = 60 * 60; // 1 hour
 
 function norm(v) {
-  return String(v || "").trim().toLowerCase().replace(/\s+/g, " ");
+  return String(v || "").trim().toLowerCase();
 }
 
 function base64url(input) {
@@ -21,44 +21,76 @@ function sign(data, secret) {
 }
 
 export default async function handler(req, res) {
-  try {
-    if (req.method !== "POST") return res.status(405).end();
+  console.log("SEND QUESTIONS LINK HIT");
 
-    const TOKEN_SECRET = process.env.TOKEN_SECRET;
-    const APP_URL = process.env.APP_URL;
-    if (!TOKEN_SECRET || !APP_URL) return res.status(500).json({ ok: false, reason: "server_misconfigured" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ ok: false, reason: "method_not_allowed" });
+  }
+
+  try {
+    const {
+      TOKEN_SECRET,
+      APP_URL,
+      SMTP_HOST,
+      SMTP_PORT,
+      SMTP_SECURE,
+      SMTP_USER,
+      SMTP_PASS,
+      MAIL_FROM
+    } = process.env;
+
+    if (
+      !TOKEN_SECRET ||
+      !APP_URL ||
+      !SMTP_HOST ||
+      !SMTP_PORT ||
+      !SMTP_USER ||
+      !SMTP_PASS
+    ) {
+      console.error("Missing env vars");
+      return res.status(500).json({
+        ok: false,
+        reason: "server_misconfigured"
+      });
+    }
 
     const { email } = req.body || {};
     const safeEmail = norm(email);
 
-    if (safeEmail !== ALLOWED_EMAIL) return res.status(403).json({ ok: false, reason: "email_denied" });
+    if (safeEmail !== ALLOWED_EMAIL) {
+      return res.status(403).json({ ok: false, reason: "email_denied" });
+    }
 
-    // stage=questions (new link)
+    // create token (stage = questions)
     const exp = Math.floor(Date.now() / 1000) + TOKEN_TTL_SECONDS;
     const payloadObj = { email: safeEmail, exp, stage: "questions" };
     const payload = base64url(JSON.stringify(payloadObj));
     const sig = sign(payload, TOKEN_SECRET);
     const token = `${payload}.${sig}`;
 
-    const questionsUrl = `${APP_URL.replace(/\/$/, "")}/questions.html?token=${encodeURIComponent(token)}`;
+    const questionsUrl =
+      `${APP_URL.replace(/\/$/, "")}/song.html?token=${encodeURIComponent(token)}`;
 
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 465),
-      secure: String(process.env.SMTP_SECURE || "true") === "true",
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+      host: SMTP_HOST,
+      port: Number(SMTP_PORT),
+      secure: String(SMTP_SECURE) === "true",
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS
+      }
     });
 
     await transporter.sendMail({
-      from: `"Private" <${process.env.MAIL_FROM || process.env.SMTP_USER}>`,
+      from: `"Private" <${MAIL_FROM || SMTP_USER}>`,
       to: ALLOWED_EMAIL,
-      subject: "Continue (Questions)",
-      text: `You may continue here:\n\n${questionsUrl}\n`
+      subject: "One question. Ten minutes.",
+      text: `Answer before time runs out:\n\n${questionsUrl}\n`
     });
 
     return res.json({ ok: true });
   } catch (err) {
-    console.error(err);
+    console.error("MAIL ERROR:", err);
     return res.status(500).json({ ok: false, reason: "mail_failed" });
   }
 }

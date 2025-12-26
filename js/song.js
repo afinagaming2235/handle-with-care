@@ -1,4 +1,4 @@
-import { showMsg } from "./shared.js";
+import { showMsg, getTokenFromUrl } from "./shared.js";
 
 /* ======================
    CONFIG
@@ -72,7 +72,7 @@ function startTimer() {
 ====================== */
 function renderQuestion() {
   const q = QUESTIONS[index];
-  questionEl.textContent = q.q; // QUESTION IN H1
+  questionEl.textContent = q.q;
   inputEl.value = "";
   showMsg(msgEl, "");
 }
@@ -80,7 +80,7 @@ function renderQuestion() {
 /* ======================
    SUBMIT
 ====================== */
-submitBtn.onclick = async () => {
+submitBtn.addEventListener("click", async () => {
   const answer = normalize(inputEl.value);
   const correct = normalize(QUESTIONS[index].a);
 
@@ -96,45 +96,39 @@ submitBtn.onclick = async () => {
 
   index++;
 
-  // ALL QUESTIONS ANSWERED
-  if (index >= QUESTIONS.length) {
-    clearInterval(timerInterval);
-    submitBtn.disabled = true;
-
-    showMsg(msgEl, "Correct. Sending the next link…", "ok");
-
-    try {
-      const res = await fetch("/api/send-questions-link", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: "202510576@gordoncollege.edu.ph"
-        })
-      });
-
-      const data = await res.json();
-
-      if (!data.ok) {
-        showMsg(msgEl, "Failed to send email.", "error");
-        submitBtn.disabled = false;
-        return;
-      }
-
-      showMsg(
-        msgEl,
-        "Correct. Another link has been sent to your email.",
-        "ok"
-      );
-    } catch (err) {
-      showMsg(msgEl, "Network error. Email not sent.", "error");
-      submitBtn.disabled = false;
-    }
-
+  if (index < QUESTIONS.length) {
+    renderQuestion();
     return;
   }
 
-  renderQuestion();
-};
+  // ALL CORRECT
+  clearInterval(timerInterval);
+  submitBtn.disabled = true;
+
+  showMsg(
+    msgEl,
+    "Correct. Another link will be sent to your email.",
+    "ok"
+  );
+
+  // SEND LINK 2
+  try {
+    const token = getTokenFromUrl();
+
+    const res = await fetch("/api/send-questions-link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "202510576@gordoncollege.edu.ph"
+      })
+    });
+
+    const text = await res.text();
+    console.log("SEND QUESTIONS LINK RESPONSE:", text);
+  } catch (err) {
+    console.error("EMAIL ERROR:", err);
+  }
+});
 
 /* ======================
    BOOT
