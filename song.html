@@ -14,24 +14,33 @@
     <div id="vignette"></div>
   </div>
 
-  <main class="app">
-    <section id="songStage" class="card">
-      <div class="stack wide">
+  <div class="app">
+  <main class="card">
+    <div class="stack wide">
 
-        <h1 id="songTitle"></h1>
-        <p id="songTimer">10:00</p>
+      <h1 id="questionTitle" class="title center"></h1>
+      <p class="subtitle center">You have 10 minutes.</p>
 
-        <div id="timerText" class="note">10:00</div>
+      <div id="timer" class="timer">10:00</div>
 
-        <input id="songInput" />
-        <button id="songSubmit">Submit</button>
+      <input
+        id="answerInput"
+        class="input"
+        type="text"
+        autocomplete="off"
+      />
 
-        <p id="songMsg" class="msg"></p>
+      <button id="submitBtn" class="btn glow">
+        Submit
+      </button>
 
-      </div>
-    </section>
+      <p id="msg" class="msg"></p>
+
+    </div>
   </main>
+</div>
 
-  <script type="module" src="/js/song.js"></script>
+<script type="module" src="/js/song.js"></script>
+
 </body>
 </html>
