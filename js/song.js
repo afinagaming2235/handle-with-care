@@ -1,26 +1,43 @@
-import { $, norm, startPixelTimer } from "./shared.js";
+import { getTokenFromUrl, norm } from "./shared.js";
 
-const A1 = "153";
-const A2 = "b.a.d.";
-let expired = false;
+const token = getTokenFromUrl();
+const ANSWER = "153";
+const LIMIT = 10 * 60;
 
-startPixelTimer($("#timerBar"), 10 * 60 * 1000, () => {
-  expired = true;
-  $("#msg").textContent = "Let’s stay as friends.";
-});
+let time = LIMIT;
+const timerEl = document.querySelector("#timer");
+const msg = document.querySelector("#msg");
 
-function check() {
-  if (expired) return;
-  if (norm($("#q1").value) === A1 && norm($("#q2").value) === A2) {
-    $("#continueBtn").classList.remove("hidden");
-  }
+function drawTimer() {
+  const m = Math.floor(time / 60);
+  const s = time % 60;
+  timerEl.textContent = `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-$("#q1").oninput = check;
-$("#q2").oninput = check;
+drawTimer();
 
-$("#continueBtn").onclick = async () => {
-  $("#msg").textContent = "Sending link…";
-  await fetch("/api/send-link2", { method: "POST" });
-  $("#msg").textContent = "Check your email again.";
+const interval = setInterval(() => {
+  time--;
+  drawTimer();
+  if (time <= 0) {
+    clearInterval(interval);
+    msg.textContent = "You don’t know me enough. Let’s stay friends.";
+  }
+}, 1000);
+
+document.querySelector("#submit").onclick = async () => {
+  if (norm(document.querySelector("#answer").value) !== ANSWER) {
+    msg.textContent = "Wrong.";
+    return;
+  }
+
+  clearInterval(interval);
+
+  await fetch("/api/send-questions-link", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token })
+  });
+
+  msg.textContent = "Check your email. One more link was sent.";
 };

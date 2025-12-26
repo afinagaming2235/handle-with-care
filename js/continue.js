@@ -521,15 +521,22 @@ function startPhotoTimer() {
 /* ======================
    BOOT
 ====================== */
-(async function boot() {
-  hudOff();
-
-  const v = await validateToken();
-  if (!v.ok || v.stage !== "full") {
+(async function boot(){
+  const token = getTokenFromUrl();
+  if (!token) {
     showOnly(blocked);
     return;
   }
 
-  // Start at heart instruction screen
+  const res = await fetch(`/api/validate-token?token=${encodeURIComponent(token)}`);
+  const data = await res.json().catch(() => null);
+
+  if (!data || !data.ok || data.stage !== "continue") {
+    showOnly(blocked);
+    return;
+  }
+
+  hearts = 3;
+  renderHearts();
   showOnly(personal);
 })();
