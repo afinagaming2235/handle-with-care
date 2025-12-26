@@ -17,21 +17,14 @@ function sign(data, secret) {
 
 export default function handler(req, res) {
   const TOKEN_SECRET = process.env.TOKEN_SECRET;
-  if (!TOKEN_SECRET) {
-    return res.status(500).json({ ok: false });
-  }
+  if (!TOKEN_SECRET) return res.status(500).json({ ok: false });
 
   const token = String(req.query.token || "");
-  if (!token.includes(".")) {
-    return res.status(403).json({ ok: false });
-  }
+  if (!token.includes(".")) return res.status(403).json({ ok: false });
 
   const [payload, sig] = token.split(".");
   const expected = sign(payload, TOKEN_SECRET);
-
-  if (sig !== expected) {
-    return res.status(403).json({ ok: false });
-  }
+  if (sig !== expected) return res.status(403).json({ ok: false });
 
   let payloadObj;
   try {
@@ -51,6 +44,6 @@ export default function handler(req, res) {
 
   return res.json({
     ok: true,
-    stage: payloadObj.stage
+    stage: payloadObj.stage || "continue"
   });
 }

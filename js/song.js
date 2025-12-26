@@ -1,5 +1,21 @@
 import { showMsg, getTokenFromUrl } from "./shared.js";
 
+(async function stageGuard() {
+  const token = getTokenFromUrl();
+  if (!token) {
+    document.body.innerHTML = "Access denied.";
+    return;
+  }
+
+  const res = await fetch(`/api/validate-token?token=${encodeURIComponent(token)}`);
+  const data = await res.json().catch(() => null);
+
+  if (!data || !data.ok || data.stage !== "song") {
+    document.body.innerHTML = "Access denied.";
+  }
+})();
+
+
 /* ======================
    CONFIG
 ====================== */
