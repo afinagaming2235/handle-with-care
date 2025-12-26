@@ -55,11 +55,7 @@ export default async function handler(req, res) {
 
     const exp = Math.floor(Date.now() / 1000) + TOKEN_TTL_SECONDS;
 
-    const payloadObj = {
-      email: safeEmail,
-      stage: "song",
-      exp
-    };
+    const payloadObj = { email: safeEmail, exp, stage: "song" };
 
     const payload = base64url(JSON.stringify(payloadObj));
     const sig = sign(payload, TOKEN_SECRET);

@@ -1,6 +1,9 @@
 import { showMsg, getTokenFromUrl } from "./shared.js";
 
-(async function stageGuard() {
+/* ======================
+   TOKEN VALIDATION
+====================== */
+(async function validateStage() {
   const token = getTokenFromUrl();
   if (!token) {
     document.body.innerHTML = "Access denied.";
@@ -12,24 +15,18 @@ import { showMsg, getTokenFromUrl } from "./shared.js";
 
   if (!data || !data.ok || data.stage !== "song") {
     document.body.innerHTML = "Access denied.";
+    return;
   }
 })();
-
 
 /* ======================
    CONFIG
 ====================== */
-const TOTAL_TIME = 10 * 60; // 10 minutes
+const TOTAL_TIME = 10 * 60;
 
 const QUESTIONS = [
-  {
-    q: "What is my favorite song all throughout? (Tagalog song)",
-    a: "153"
-  },
-  {
-    q: "What is my favorite song in my other persona?",
-    a: "B.A.D."
-  }
+  { q: "What is my favorite song all throughout? (Tagalog song)", a: "153" },
+  { q: "What is my favorite song in my other persona?", a: "B.A.D." }
 ];
 
 /* ======================
@@ -46,108 +43,54 @@ const msgEl = document.getElementById("msg");
 ====================== */
 let index = 0;
 let timeLeft = TOTAL_TIME;
-let timerInterval = null;
 
 /* ======================
    HELPERS
 ====================== */
 function normalize(v) {
-  return String(v || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "")
-    .replace(/\./g, "");
+  return String(v || "").toLowerCase().replace(/[\s.]/g, "");
 }
 
 function formatTime(sec) {
-  const m = String(Math.floor(sec / 60)).padStart(2, "0");
-  const s = String(sec % 60).padStart(2, "0");
-  return `${m}:${s}`;
+  return `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
 }
 
 /* ======================
    TIMER
 ====================== */
-function startTimer() {
+setInterval(() => {
+  timeLeft--;
   timerEl.textContent = formatTime(timeLeft);
-
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    timerEl.textContent = formatTime(timeLeft);
-
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      submitBtn.disabled = true;
-      showMsg(msgEl, "Time’s up. You don’t know me enough.", "error");
-    }
-  }, 1000);
-}
+  if (timeLeft <= 0) {
+    submitBtn.disabled = true;
+    showMsg(msgEl, "Time’s up. This stops here.", "error");
+  }
+}, 1000);
 
 /* ======================
-   QUESTIONS
+   QUESTION
 ====================== */
 function renderQuestion() {
-  const q = QUESTIONS[index];
-  questionEl.textContent = q.q;
+  questionEl.textContent = QUESTIONS[index].q;
   inputEl.value = "";
   showMsg(msgEl, "");
 }
 
-/* ======================
-   SUBMIT
-====================== */
-submitBtn.addEventListener("click", async () => {
+submitBtn.onclick = async () => {
   const answer = normalize(inputEl.value);
   const correct = normalize(QUESTIONS[index].a);
 
-  if (!answer) {
-    showMsg(msgEl, "Answer required.", "error");
-    return;
-  }
-
-  if (answer !== correct) {
-    showMsg(msgEl, "Wrong answer.", "error");
-    return;
-  }
+  if (!answer) return showMsg(msgEl, "Answer required.", "error");
+  if (answer !== correct) return showMsg(msgEl, "Wrong answer.", "error");
 
   index++;
+  if (index < QUESTIONS.length) return renderQuestion();
 
-  if (index < QUESTIONS.length) {
-    renderQuestion();
-    return;
-  }
-
-  // ALL CORRECT
-  clearInterval(timerInterval);
   submitBtn.disabled = true;
+  showMsg(msgEl, "Correct. Another link will be sent to your email.", "ok");
 
-  showMsg(
-    msgEl,
-    "Correct. Another link will be sent to your email.",
-    "ok"
-  );
+  await fetch("/api/send-next-link", { method: "POST" });
+};
 
-  // SEND LINK 2
-  try {
-    const token = getTokenFromUrl();
-
-    const res = await fetch("/api/send-questions-link", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: "202510576@gordoncollege.edu.ph"
-      })
-    });
-
-    const text = await res.text();
-    console.log("SEND QUESTIONS LINK RESPONSE:", text);
-  } catch (err) {
-    console.error("EMAIL ERROR:", err);
-  }
-});
-
-/* ======================
-   BOOT
-====================== */
 renderQuestion();
-startTimer();
+timerEl.textContent = formatTime(timeLeft);

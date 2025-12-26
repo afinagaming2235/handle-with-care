@@ -9,10 +9,7 @@ function base64urlToString(b64url) {
 }
 
 function sign(data, secret) {
-  return crypto
-    .createHmac("sha256", secret)
-    .update(data)
-    .digest("base64url");
+  return crypto.createHmac("sha256", secret).update(data).digest("base64url");
 }
 
 export default function handler(req, res) {
@@ -23,27 +20,26 @@ export default function handler(req, res) {
   if (!token.includes(".")) return res.status(403).json({ ok: false });
 
   const [payload, sig] = token.split(".");
-  const expected = sign(payload, TOKEN_SECRET);
-  if (sig !== expected) return res.status(403).json({ ok: false });
+  if (sign(payload, TOKEN_SECRET) !== sig)
+    return res.status(403).json({ ok: false });
 
-  let payloadObj;
+  let data;
   try {
-    payloadObj = JSON.parse(base64urlToString(payload));
+    data = JSON.parse(base64urlToString(payload));
   } catch {
     return res.status(403).json({ ok: false });
   }
 
-  const now = Math.floor(Date.now() / 1000);
-  if (!payloadObj.exp || now > payloadObj.exp) {
+  if (Date.now() / 1000 > data.exp) {
     return res.status(403).json({ ok: false });
   }
 
-  if (payloadObj.email !== ALLOWED_EMAIL) {
+  if (data.email !== ALLOWED_EMAIL) {
     return res.status(403).json({ ok: false });
   }
 
   return res.json({
     ok: true,
-    stage: payloadObj.stage || "continue"
+    stage: data.stage
   });
 }
