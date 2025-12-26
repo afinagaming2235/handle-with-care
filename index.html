@@ -1,17 +1,58 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Start</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>This is not for everyone</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/styles.css" />
 </head>
 <body>
-<main class="card">
-  <input id="name" class="input" placeholder="Name">
-  <input id="email" class="input" placeholder="Email">
-  <button id="sendBtn" class="btn glow">Send me the link</button>
-  <p id="msg" class="msg"></p>
-</main>
-<script type="module" src="/js/landing.js"></script>
+
+  <!-- Background layers -->
+  <div id="bg"></div>
+  <div id="fog"></div>
+  <div id="noise"></div>
+  <div id="vignette"></div>
+
+  <!-- APP -->
+  <main class="app">
+    <section class="card">
+      <div class="stack wide">
+
+        <p class="title">This is not for everyone.</p>
+        <p class="subtitle">
+          If this is meant for you, say your name.
+        </p>
+
+        <input
+          id="name"
+          class="input"
+          placeholder="Name"
+          autocomplete="off"
+        />
+
+        <p class="subtitle">Enter your email.</p>
+
+        <input
+          id="email"
+          class="input"
+          placeholder="Email"
+          autocomplete="off"
+        />
+
+        <button id="sendBtn" class="btn glow">
+          Send me the link
+        </button>
+
+        <div id="msg" class="msg"></div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Script -->
+  <script type="module" src="./js/landing.js"></script>
 </body>
 </html>
