@@ -70,12 +70,16 @@ function lockScreen(title, message) {
 
 // ---------- QUESTIONS ----------
 function renderQuestion() {
-  inputEl.value = "";
-  showMsg("");
+  const q = QUESTIONS[index];
 
-  titleEl.textContent = "One question.";
-  inputEl.placeholder = QUESTIONS[index].q;
+  // SHOW QUESTION IN H1
+  document.getElementById("questionTitle").textContent = q.q;
+
+  // CLEAR INPUT + MESSAGE
+  inputEl.value = "";
+  showMsg(msgEl, "");
 }
+
 
 // ---------- SUBMIT ----------
 submitBtn.onclick = () => {
