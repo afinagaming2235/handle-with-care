@@ -1,21 +1,37 @@
-<section id="songStage" class="card">
-  <h2>One question.</h2>
-  <p>You have 10 minutes.</p>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>One Question</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
 
-  <div id="timerText">10:00</div>
+  <!-- Background (same as other pages) -->
+  <div id="bg">
+    <div id="fog"></div>
+    <div id="noise"></div>
+    <div id="vignette"></div>
+  </div>
 
-  <input
-    id="songAnswer"
-    class="input"
-    placeholder="Type your answer"
-    autocomplete="off"
-  />
+  <main class="app">
+    <section id="songStage" class="card">
+      <div class="stack wide">
 
-  <button id="submitSong" class="btn glow">
-    Submit
-  </button>
+        <h1 id="songTitle">One question.</h1>
+        <p id="songTimer">10:00</p>
 
-  <p id="songMsg" class="msg"></p>
-</section>
+        <div id="timerText" class="note">10:00</div>
 
-<script type="module" src="/js/song.js"></script>
+        <input id="songInput" />
+        <button id="songSubmit">Submit</button>
+
+        <p id="songMsg" class="msg"></p>
+
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/js/song.js"></script>
+</body>
+</html>

@@ -1,94 +1,121 @@
-import { $, showMsg } from "./shared.js";
+// ===============================
+// SONG QUESTIONS (LINK 1)
+// ===============================
 
-document.addEventListener("DOMContentLoaded", () => {
+// ---------- CONFIG ----------
+const TOTAL_TIME = 10 * 60; // 10 minutes in seconds
 
-  const timerEl   = $("#timerText");
-  const inputEl   = $("#songAnswer");
-  const submitBtn = $("#submitSong");
-  const msgEl     = $("#songMsg");
+const QUESTIONS = [
+  {
+    q: "What is my favorite song all throughout? (Tagalog song)",
+    a: "153"
+  },
+  {
+    q: "What is my favorite song in my other persona?",
+    a: "B.A.D."
+  }
+];
 
-  // 🔒 SAFETY CHECK
-  if (!timerEl || !inputEl || !submitBtn || !msgEl) {
-    console.error("Song page HTML elements missing");
+// ---------- HELPERS ----------
+function normalize(v) {
+  return String(v || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "");
+}
+
+// ---------- DOM ----------
+const titleEl   = document.getElementById("songTitle");
+const timerEl   = document.getElementById("songTimer");
+const inputEl   = document.getElementById("songInput");
+const submitBtn = document.getElementById("songSubmit");
+const msgEl     = document.getElementById("songMsg");
+
+// ---------- STATE ----------
+let index = 0;
+let timeLeft = TOTAL_TIME;
+let timerInterval = null;
+
+// ---------- TIMER ----------
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+
+    const min = Math.floor(timeLeft / 60);
+    const sec = timeLeft % 60;
+    timerEl.textContent = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      lockScreen(
+        "Time’s up.",
+        "You don’t know me enough yet. Let’s stay friends."
+      );
+    }
+  }, 1000);
+}
+
+// ---------- UI ----------
+function showMsg(text, type = "") {
+  msgEl.textContent = text;
+  msgEl.className = "msg " + type;
+}
+
+function lockScreen(title, message) {
+  submitBtn.disabled = true;
+  inputEl.disabled = true;
+  titleEl.textContent = title;
+  showMsg(message, "error");
+}
+
+// ---------- QUESTIONS ----------
+function renderQuestion() {
+  inputEl.value = "";
+  showMsg("");
+
+  titleEl.textContent = "One question.";
+  inputEl.placeholder = QUESTIONS[index].q;
+}
+
+// ---------- SUBMIT ----------
+submitBtn.onclick = () => {
+  submitBtn.disabled = true;
+
+  const answer  = normalize(inputEl.value);
+  const correct = normalize(QUESTIONS[index].a);
+
+  if (!answer) {
+    showMsg("Answer required.", "error");
+    submitBtn.disabled = false;
     return;
   }
 
-  /* ======================
-     QUESTIONS
-  ====================== */
-  const QUESTIONS = [
-    { q: "What is my favorite song all throughout? (Tagalog)", a: "153" },
-    { q: "What is my favorite song in my other persona?", a: "b.a.d." }
-  ];
-
-  let index = 0;
-
-  /* ======================
-     TIMER (10 MINUTES)
-  ====================== */
-  let remaining = 10 * 60; // seconds
-
-  function updateTimer() {
-    const m = String(Math.floor(remaining / 60)).padStart(2, "0");
-    const s = String(remaining % 60).padStart(2, "0");
-    timerEl.textContent = `${m}:${s}`;
-
-    if (remaining <= 0) {
-      showMsg(msgEl, "You don’t know me enough. Let’s stay friends.", "error");
-      submitBtn.disabled = true;
-      clearInterval(timerInterval);
-    }
-
-    remaining--;
+  if (answer !== correct) {
+    showMsg("Wrong answer.", "error");
+    submitBtn.disabled = false;
+    return;
   }
 
-  updateTimer();
-  const timerInterval = setInterval(updateTimer, 1000);
+  // correct
+  index++;
 
-  /* ======================
-     RENDER QUESTION
-  ====================== */
-  function renderQuestion() {
-    msgEl.textContent = "";
-    inputEl.value = "";
-    inputEl.placeholder = QUESTIONS[index].q;
+  if (index >= QUESTIONS.length) {
+    clearInterval(timerInterval);
+    showMsg(
+      "Correct. Another link will be sent to your email.",
+      "ok"
+    );
+
+    // 🔗 TODO: CALL API TO SEND LINK 2 HERE
+    // fetch("/api/continue-link", { method: "POST" })
+
+    return;
   }
 
+  submitBtn.disabled = false;
   renderQuestion();
+};
 
-  /* ======================
-     SUBMIT HANDLER
-  ====================== */
-  submitBtn.onclick = () => {
-    const answer = inputEl.value.trim().toLowerCase();
-    const correct = QUESTIONS[index].a.toLowerCase();
-
-    if (!answer) {
-      showMsg(msgEl, "Answer required.", "error");
-      return;
-    }
-
-    if (answer !== correct) {
-      showMsg(msgEl, "Wrong answer.", "error");
-      return;
-    }
-
-    index++;
-
-    if (index >= QUESTIONS.length) {
-      clearInterval(timerInterval);
-      showMsg(
-        msgEl,
-        "Correct. Another link will be sent to your email.",
-        "ok"
-      );
-
-      // TODO: call API to send LINK 2
-      submitBtn.disabled = true;
-      return;
-    }
-
-    renderQuestion();
-  };
-
-});
+// ---------- BOOT ----------
+renderQuestion();
+startTimer();
