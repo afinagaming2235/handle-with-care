@@ -1,43 +1,32 @@
-import { getTokenFromUrl, norm } from "./shared.js";
+import { getTokenFromUrl } from "./shared.js";
 
 const token = getTokenFromUrl();
-const ANSWER = "153";
-const LIMIT = 10 * 60;
+const timeBar = document.getElementById("timeBar");
+const btn = document.getElementById("continueBtn");
+const input = document.getElementById("answer");
 
-let time = LIMIT;
-const timerEl = document.querySelector("#timer");
-const msg = document.querySelector("#msg");
+let time = 600; // 10 mins
 
-function drawTimer() {
-  const m = Math.floor(time / 60);
-  const s = time % 60;
-  timerEl.textContent = `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-drawTimer();
-
-const interval = setInterval(() => {
+const timer = setInterval(() => {
   time--;
-  drawTimer();
+  timeBar.style.width = `${(time / 600) * 100}%`;
+
   if (time <= 0) {
-    clearInterval(interval);
-    msg.textContent = "You don’t know me enough. Let’s stay friends.";
+    clearInterval(timer);
+    document.body.innerHTML = "<h2>You don’t know me enough. Let’s stay friends.</h2>";
   }
 }, 1000);
 
-document.querySelector("#submit").onclick = async () => {
-  if (norm(document.querySelector("#answer").value) !== ANSWER) {
-    msg.textContent = "Wrong.";
-    return;
-  }
+btn.onclick = async () => {
+  if (input.value.trim() !== "153") return;
 
-  clearInterval(interval);
+  clearInterval(timer);
 
-  await fetch("/api/send-questions-link", {
+  await fetch("/api/continue-link", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token })
   });
 
-  msg.textContent = "Check your email. One more link was sent.";
+  alert("Check your email. Another link was sent.");
 };

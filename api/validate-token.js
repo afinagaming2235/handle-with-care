@@ -9,45 +9,48 @@ function base64urlToString(b64url) {
 }
 
 function sign(data, secret) {
-  return crypto.createHmac("sha256", secret).update(data).digest("base64url");
+  return crypto
+    .createHmac("sha256", secret)
+    .update(data)
+    .digest("base64url");
 }
 
 export default function handler(req, res) {
   const TOKEN_SECRET = process.env.TOKEN_SECRET;
   if (!TOKEN_SECRET) {
-    return res.status(500).json({ ok: false, reason: "missing_secret" });
+    return res.status(500).json({ ok: false });
   }
 
   const token = String(req.query.token || "");
   if (!token.includes(".")) {
-    return res.status(403).json({ ok: false, reason: "bad_token" });
+    return res.status(403).json({ ok: false });
   }
 
   const [payload, sig] = token.split(".");
-  if (sign(payload, TOKEN_SECRET) !== sig) {
-    return res.status(403).json({ ok: false, reason: "invalid_signature" });
+  const expected = sign(payload, TOKEN_SECRET);
+
+  if (sig !== expected) {
+    return res.status(403).json({ ok: false });
   }
 
-  let data;
+  let payloadObj;
   try {
-    data = JSON.parse(base64urlToString(payload));
+    payloadObj = JSON.parse(base64urlToString(payload));
   } catch {
-    return res.status(403).json({ ok: false, reason: "invalid_payload" });
+    return res.status(403).json({ ok: false });
   }
 
   const now = Math.floor(Date.now() / 1000);
-  if (!data.exp || now > data.exp) {
-    return res.status(403).json({ ok: false, reason: "expired" });
+  if (!payloadObj.exp || now > payloadObj.exp) {
+    return res.status(403).json({ ok: false });
   }
 
-  if (String(data.email).toLowerCase() !== ALLOWED_EMAIL) {
-    return res.status(403).json({ ok: false, reason: "email_denied" });
+  if (payloadObj.email !== ALLOWED_EMAIL) {
+    return res.status(403).json({ ok: false });
   }
 
-  const allowedStages = ["song", "continue"];
-  if (!allowedStages.includes(data.stage)) {
-    return res.status(403).json({ ok: false, reason: "stage_denied" });
-  }
-
-  return res.json({ ok: true, stage: data.stage });
+  return res.json({
+    ok: true,
+    stage: payloadObj.stage
+  });
 }
