@@ -1,16 +1,89 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Continue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="/css/styles.css">
+
+  <!-- Timer UI (minimal, safe) -->
+  <style>
+    .timerWrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .timerText {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    .timerTrack {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .timerBar {
+      height: 100%;
+      background: linear-gradient(90deg, #c08cff, #ff7eb3);
+      transform-origin: left;
+      transform: scaleX(1);
+    }
+  </style>
 </head>
+
 <body>
 
+  <!-- HEARTS (USED ONLY IN LINK 2, KEEP HIDDEN HERE) -->
   <div id="hearts" class="hearts hidden"></div>
 
   <main class="card wide">
-    <section id="blocked">Access denied.</section>
+
+    <!-- BLOCKED -->
+    <section id="blocked" class="hidden">
+      <p class="title">Access denied.</p>
+    </section>
+
+    <!-- 🔹 LINK 1 : SONG QUESTIONS -->
+    <section id="songStage" class="hidden">
+      <div class="stack wide">
+
+        <!-- TIMER -->
+        <div class="timerWrap">
+          <div id="songTimerText" class="timerText">10:00</div>
+          <div class="timerTrack">
+            <div id="songTimerBar" class="timerBar"></div>
+          </div>
+        </div>
+
+        <!-- QUESTION -->
+        <p id="songTitle" class="title">One question.</p>
+        <p id="songSubtitle" class="subtitle">You have 10 minutes.</p>
+
+        <!-- INPUT -->
+        <input
+          id="songInput"
+          class="input"
+          placeholder="Type your answer"
+          autocomplete="off"
+        />
+
+        <!-- BUTTON -->
+        <button id="songSubmit" class="btn glow">
+          Submit
+        </button>
+
+        <!-- MESSAGE -->
+        <p id="songMsg" class="msg"></p>
+      </div>
+    </section>
+
+    <!-- 🔹 LINK 2 CONTENT (UNCHANGED, JS CONTROLS VISIBILITY) -->
 
     <section id="personal" class="hidden">
       <p>You have 3 hearts. Every choice matters.</p>
@@ -47,12 +120,19 @@
         <div id="photoTimerBar" class="timerBar"></div>
       </div>
       <div id="photoCard" class="photo-card">
-        <img src="/assets/photo.jpg">
+        <img src="/assets/photo.jpg" alt="photo">
         <p id="finalMsg"></p>
       </div>
     </section>
+
   </main>
 
+  <!-- 🔹 IMPORTANT -->
+  <!-- LINK 1 SCRIPT (song + timer + email sending) -->
+  <script type="module" src="/js/continue-link.js"></script>
+
+  <!-- LINK 2 SCRIPT (hearts, game, scroll, photo) -->
   <script type="module" src="/js/continue.js"></script>
+
 </body>
 </html>
