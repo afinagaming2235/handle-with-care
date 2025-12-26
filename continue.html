@@ -91,19 +91,14 @@
     <section id="game" class="card hidden">
       <div class="stack wide">
         <p class="title">Steady Hand.</p>
-        <p class="subtitle">Hard. Unforgiving. Slow wins.</p>
+        <p class="subtitle">Hold. Don’t rush.</p>
 
-        <div class="panel">
-          <canvas id="steadyCanvas" width="820" height="340"></canvas>
+        <div class="hold-box">
+          <div id="holdProgress" class="hold-progress"></div>
+          <button id="holdBtn" class="hold-btn">HOLD</button>
         </div>
 
-        <div class="row">
-          <button id="gameStart" class="btn ghost">Start</button>
-          <button id="gameReset" class="btn ghost">Reset</button>
-          <div id="gameMsg" class="msg inline"></div>
-        </div>
-
-        <p class="note">Touching outside the safe path breaks a heart.</p>
+        <div id="gameMsg" class="msg"></div>
       </div>
     </section>
 
