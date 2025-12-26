@@ -1,17 +1,12 @@
-export const $ = (sel) => document.querySelector(sel);
+export const $ = s => document.querySelector(s);
+export const norm = v => String(v || "").trim().toLowerCase();
 
-export function norm(v){
-  return String(v || "").trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-export function showMsg(el, text, type=""){
-  if(!el) return;
-  el.textContent = text || "";
-  el.classList.remove("error","ok");
-  if(type) el.classList.add(type);
-}
-
-export function getTokenFromUrl(){
-  const u = new URL(window.location.href);
-  return String(u.searchParams.get("token") || "").trim();
+export function startPixelTimer(bar, duration, onEnd) {
+  const start = Date.now();
+  function tick() {
+    const r = Math.max(0, 1 - (Date.now() - start) / duration);
+    bar.style.transform = `scaleX(${r})`;
+    r <= 0 ? onEnd() : requestAnimationFrame(tick);
+  }
+  tick();
 }

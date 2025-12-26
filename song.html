@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>If you really know me</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <main class="card wide">
+        <div class="timerTrack">
+            <div id="timerBar" class="timerBar"></div>
+        </div>
+
+        <p class="subtitle">
+            The bar above slowly disappears.<br>
+            If it runs out before you answer,<br>
+            let’s stay as friends.
+        </p>
+
+        <input id="q1" class="input" placeholder="Favorite song (tagalog)">
+        <input id="q2" class="input" placeholder="Favorite song (playlist)">
+
+        <button id="continueBtn" class="btn glow hidden">
+            Continue (a link will be sent)
+        </button>
+
+        <p id="msg" class="msg"></p>
+    </main>
+
+    <script type="module" src="/js/songs.js"></script>
+</body>
+</html>

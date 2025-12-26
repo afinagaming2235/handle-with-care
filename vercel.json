@@ -1,1 +1,7 @@
-{}
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/songs", "destination": "/songs.html" },
+    { "source": "/continue", "destination": "/continue.html" }
+  ]
+}

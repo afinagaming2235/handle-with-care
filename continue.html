@@ -1,167 +1,58 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>continue</title>
-  <link rel="stylesheet" href="./css/styles.css" />
+  <meta charset="utf-8">
+  <title>Continue</title>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <div id="bg">
-    <div id="fog"></div>
-    <div id="noise"></div>
-    <div id="vignette"></div>
-  </div>
 
-  <div id="hearts" class="hearts">
-    <img src="/assets/heart.svg" class="heart" alt="heart">
-    <img src="/assets/heart.svg" class="heart" alt="heart">
-    <img src="/assets/heart.svg" class="heart" alt="heart">
-  </div>
+  <div id="hearts" class="hearts hidden"></div>
 
+  <main class="card wide">
+    <section id="blocked">Access denied.</section>
 
-  <main class="app">
-    <section id="blocked" class="card hidden">
-      <div class="stack">
-        <p class="title">Access denied.</p>
-        <p class="subtitle">This page only opens from the email link.</p>
+    <section id="personal" class="hidden">
+      <p>You have 3 hearts. Every choice matters.</p>
+      <button id="personalBtn" class="btn glow">I understand</button>
+    </section>
+
+    <section id="mainQuestions" class="hidden">
+      <p id="mqPrompt"></p>
+      <div id="mqChoices"></div>
+      <p id="mqMsg" class="msg"></p>
+    </section>
+
+    <section id="afterMain" class="hidden">
+      <p id="afterMainTitle"></p>
+      <p id="afterMainBody"></p>
+      <button id="toGameBtn" class="btn glow hidden">Continue</button>
+    </section>
+
+    <section id="game" class="hidden">
+      <div class="hold-box">
+        <div id="holdProgress" class="hold-progress"></div>
+        <button id="holdBtn" class="hold-btn">HOLD</button>
       </div>
     </section>
 
-    <section id="personal" class="card hidden">
-      <div class="stack wide">
-        <p class="title">If you really know me…</p>
-
-        <div class="qblock">
-          <p class="subtitle">What is my favorite song all through out? (clue: tagalog song)</p>
-          <p class="question">Type the correct answer.</p>
-          <input id="p1" class="input" placeholder="answer" autocomplete="off" />
-          <div id="p1Msg" class="msg"></div>
-        </div>
-
-        <div class="qblock">
-          <p class="subtitle">What's my favorite song in my other persona (clue: in a playlist)</p>
-          <p class="question">Type the correct answer.</p>
-          <input id="p2" class="input" placeholder="answer" autocomplete="off" />
-          <div id="p2Msg" class="msg"></div>
-        </div>
-
-        <button id="personalBtn" class="btn glow">Continue</button>
-        <div id="personalMsg" class="msg"></div>
-      </div>
+    <section id="scroll" class="hidden">
+      <button id="openScroll" class="btn">Open</button>
+      <div id="letter"></div>
+      <button id="toFinalBtn" class="btn glow hidden">Continue</button>
     </section>
 
-    <section id="heartIntro" class="card hidden">
-      <div class="stack wide">
-        <p class="title">Before we continue.</p>
-
-        <p class="subtitle">
-          These hearts represent how carefully you treat me.
-          <br><br>
-          Every choice matters.
-          <br>
-          Some answers protect a heart.
-          Others slowly break it.
-          <br><br>
-          Lose all hearts — and this ends.
-        </p>
-
-        <button id="toMainBtn" class="btn glow">I understand</button>
+    <section id="final" class="hidden">
+      <div class="timerTrack">
+        <div id="photoTimerBar" class="timerBar"></div>
       </div>
-    </section>
-
-
-    <section id="mainQuestions" class="card hidden">
-      <div class="stack wide">
-        <p class="title">From here on, every choice matters.</p>
-        <p id="mqPrompt" class="question big"></p>
-        <div id="mqChoices" class="choices"></div>
-        <div id="mqMsg" class="msg"></div>
-      </div>
-    </section>
-
-    <section id="afterMain" class="card hidden">
-      <div class="stack wide">
-        <p class="title" id="afterMainTitle"></p>
-        <p class="subtitle" id="afterMainBody"></p>
-        <button id="toGameBtn" class="btn glow hidden">Continue</button>
-      </div>
-    </section>
-
-    <section id="game" class="card hidden">
-      <div class="stack wide">
-        <p class="title">Steady Hand.</p>
-        <p class="subtitle">Hold. Don’t rush.</p>
-
-        <div class="hold-box">
-          <div id="holdProgress" class="hold-progress"></div>
-          <button id="holdBtn" class="hold-btn">HOLD</button>
-        </div>
-
-        <div id="gameMsg" class="msg"></div>
-      </div>
-    </section>
-
-
-    <section id="afterGame" class="card hidden">
-      <div class="stack wide">
-        <p class="title" id="afterGameTitle"></p>
-        <p class="subtitle" id="afterGameBody"></p>
-        <button id="toScrollBtn" class="btn glow hidden">Continue</button>
-      </div>
-    </section>
-
-    <section id="scroll" class="card hidden">
-      <div class="stack wide">
-        <p class="title">Some answers are written, but not yet opened.</p>
-
-        <button id="openScroll" class="scrollBtn" aria-label="Open scroll">
-          <span class="scrollClosed"></span>
-        </button>
-
-        <div id="letterWrap" class="scrollOpen hidden">
-          <div class="paper">
-            <div id="letter" class="letter"></div>
-          </div>
-        </div>
-
-        <button id="toFinalBtn" class="btn glow hidden">Continue</button>
-      </div>
-    </section>
-
-
-    <section id="final" class="card hidden">
-      <div class="stack wide">
-        <p class="title" id="finalTitle">Final.</p>
-        <p class="subtitle" id="finalSub"></p>
-
-        <div id="grid" class="grid"></div>
-        <div id="finalMsg" class="msg"></div>
-
-        <div id="photoStage" class="hidden">
-          <div id="photoCard" class="photo-card">
-
-            <div class="card-front">
-              <canvas id="scratch" width="360" height="240"></canvas>
-            </div>
-
-            <div class="card-back">
-              <img
-                src="/assets/20251206_190038.jpg"
-                alt="Us"
-                class="photo-img"
-              />
-              <div id="revealText" class="hidden">
-                My answer is yes.
-              </div>
-            </div>
-
-          </div>
-        </div>
+      <div id="photoCard" class="photo-card">
+        <img src="/assets/photo.jpg">
+        <p id="finalMsg"></p>
       </div>
     </section>
   </main>
 
-  <script type="module" src="./js/continue.js"></script>
+  <script type="module" src="/js/continue.js"></script>
 </body>
 </html>
