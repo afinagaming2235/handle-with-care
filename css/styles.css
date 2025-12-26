@@ -318,3 +318,15 @@ html, body {
   font-size: 22px;
   background: rgba(18,7,23,0.75);
 }
+
+.timer {
+  text-align: center;
+  font-size: 16px;
+  letter-spacing: 2px;
+  opacity: 0.8;
+  margin: 12px 0 24px;
+}
+
+.center {
+  text-align: center;
+}
