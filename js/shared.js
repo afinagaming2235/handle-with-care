@@ -1,12 +1,21 @@
-export const $ = s => document.querySelector(s);
-export const norm = v => String(v || "").trim().toLowerCase();
+export function $(sel) {
+  return document.querySelector(sel);
+}
 
-export function startPixelTimer(bar, duration, onEnd) {
-  const start = Date.now();
-  function tick() {
-    const r = Math.max(0, 1 - (Date.now() - start) / duration);
-    bar.style.transform = `scaleX(${r})`;
-    r <= 0 ? onEnd() : requestAnimationFrame(tick);
-  }
-  tick();
+export function norm(v) {
+  return String(v || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+export function showMsg(el, text = "", type = "") {
+  if (!el) return;
+  el.textContent = text;
+  el.className = `msg ${type}`;
+}
+
+export function getTokenFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("token");
 }
