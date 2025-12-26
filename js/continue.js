@@ -278,11 +278,19 @@ $("#photoCard").addEventListener("click", () => {
 /* ======================
    BOOT
 ====================== */
-(async function boot() {
+(async function boot(){
+  // Always start clean
+  hudOff();
+
   const ok = await validateToken();
+
   if (!ok) {
     showOnly(blocked);
     return;
   }
-  showOnly(personal);
+
+  // Token is valid → start at personal questions
+  hearts = 3;          // reset hearts
+  renderHearts();      // prepare HUD
+  showOnly(personal);  // SHOW THE FIRST CARD
 })();
