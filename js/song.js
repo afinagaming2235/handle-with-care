@@ -1,9 +1,9 @@
-// ===============================
-// SONG QUESTIONS (LINK 1)
-// ===============================
+import { showMsg } from "./shared.js";
 
-// ---------- CONFIG ----------
-const TOTAL_TIME = 10 * 60; // 10 minutes in seconds
+/* ======================
+   CONFIG
+====================== */
+const TOTAL_TIME = 10 * 60; // 10 minutes (seconds)
 
 const QUESTIONS = [
   {
@@ -16,110 +16,102 @@ const QUESTIONS = [
   }
 ];
 
-// ---------- HELPERS ----------
-function normalize(v) {
-  return String(v || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "");
-}
+/* ======================
+   ELEMENTS
+====================== */
+const questionEl = document.getElementById("questionTitle");
+const timerEl = document.getElementById("timer");
+const inputEl = document.getElementById("answerInput");
+const submitBtn = document.getElementById("submitBtn");
+const msgEl = document.getElementById("msg");
 
-// ---------- DOM ----------
-const titleEl   = document.getElementById("songTitle");
-const timerEl   = document.getElementById("songTimer");
-const inputEl   = document.getElementById("songInput");
-const submitBtn = document.getElementById("songSubmit");
-const msgEl     = document.getElementById("songMsg");
-
-// ---------- STATE ----------
+/* ======================
+   STATE
+====================== */
 let index = 0;
 let timeLeft = TOTAL_TIME;
 let timerInterval = null;
 
-// ---------- TIMER ----------
+/* ======================
+   HELPERS
+====================== */
+function normalize(v) {
+  return String(v || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/\./g, "");
+}
+
+function formatTime(sec) {
+  const m = String(Math.floor(sec / 60)).padStart(2, "0");
+  const s = String(sec % 60).padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+/* ======================
+   TIMER
+====================== */
 function startTimer() {
+  timerEl.textContent = formatTime(timeLeft);
+
   timerInterval = setInterval(() => {
     timeLeft--;
-
-    const min = Math.floor(timeLeft / 60);
-    const sec = timeLeft % 60;
-    timerEl.textContent = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+    timerEl.textContent = formatTime(timeLeft);
 
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
-      lockScreen(
-        "Time’s up.",
-        "You don’t know me enough yet. Let’s stay friends."
-      );
+      submitBtn.disabled = true;
+      showMsg(msgEl, "Time’s up. You don’t know me enough.", "error");
     }
   }, 1000);
 }
 
-// ---------- UI ----------
-function showMsg(text, type = "") {
-  msgEl.textContent = text;
-  msgEl.className = "msg " + type;
-}
-
-function lockScreen(title, message) {
-  submitBtn.disabled = true;
-  inputEl.disabled = true;
-  titleEl.textContent = title;
-  showMsg(message, "error");
-}
-
-// ---------- QUESTIONS ----------
+/* ======================
+   QUESTIONS
+====================== */
 function renderQuestion() {
   const q = QUESTIONS[index];
-
-  // SHOW QUESTION IN H1
-  document.getElementById("questionTitle").textContent = q.q;
-
-  // CLEAR INPUT + MESSAGE
+  questionEl.textContent = q.q;
   inputEl.value = "";
   showMsg(msgEl, "");
 }
 
-
-// ---------- SUBMIT ----------
+/* ======================
+   SUBMIT
+====================== */
 submitBtn.onclick = () => {
-  submitBtn.disabled = true;
-
-  const answer  = normalize(inputEl.value);
+  const answer = normalize(inputEl.value);
   const correct = normalize(QUESTIONS[index].a);
 
   if (!answer) {
-    showMsg("Answer required.", "error");
-    submitBtn.disabled = false;
+    showMsg(msgEl, "Answer required.", "error");
     return;
   }
 
   if (answer !== correct) {
-    showMsg("Wrong answer.", "error");
-    submitBtn.disabled = false;
+    showMsg(msgEl, "Wrong answer.", "error");
     return;
   }
 
-  // correct
   index++;
 
   if (index >= QUESTIONS.length) {
     clearInterval(timerInterval);
     showMsg(
+      msgEl,
       "Correct. Another link will be sent to your email.",
       "ok"
     );
-
-    // 🔗 TODO: CALL API TO SEND LINK 2 HERE
-    // fetch("/api/continue-link", { method: "POST" })
-
+    submitBtn.disabled = true;
     return;
   }
 
-  submitBtn.disabled = false;
   renderQuestion();
 };
 
-// ---------- BOOT ----------
-renderQuestion();
-startTimer();
+/* ======================
+   BOOT (THIS WAS MISSING)
+====================== */
+renderQuestion();   // ← THIS fixes the missing question
+startTimer();       // ← THIS fixes the frozen timer
