@@ -1,20 +1,27 @@
 import { $, showMsg, getTokenFromUrl } from "./shared.js";
 
 /* ======================
-   TOKEN
+   TOKEN VALIDATION
 ====================== */
 const token = getTokenFromUrl();
+
+async function validateToken() {
+  if (!token) return false;
+  const res = await fetch(`/api/validate-token?token=${encodeURIComponent(token)}`);
+  const data = await res.json().catch(() => null);
+  return data && data.ok && data.stage === "continue";
+}
 
 /* ======================
    SECTIONS
 ====================== */
-const blocked   = $("#blocked");
-const personal  = $("#personal");
-const main      = $("#mainQuestions");
+const blocked = $("#blocked");
+const personal = $("#personal");
+const main = $("#mainQuestions");
 const afterMain = $("#afterMain");
-const game      = $("#game");
-const scroll    = $("#scroll");
-const final     = $("#final");
+const game = $("#game");
+const scroll = $("#scroll");
+const final = $("#final");
 
 function showOnly(section) {
   [blocked, personal, main, afterMain, game, scroll, final]
@@ -47,226 +54,188 @@ function hudOn() {
 }
 
 /* ======================
-   SCORING RULES
+   HEART INSTRUCTIONS
 ====================== */
-const MIN_TEXT_LEN = 80;
-
-function scoreByRules(answer, rules) {
-  const a = answer.toLowerCase();
-  if (rules.red.some(r => r.test(a))) return 2;
-  if (rules.yellow.some(r => r.test(a))) return 1;
-  return 0;
-}
-
-const RULES_LEAVING = {
-  red: [/don'?t\s+leave|stay\s+here|owe\s+me/i],
-  yellow: [/hard|struggle|not\s+sure/i],
-  green: [/respect|support|future|dream/i]
-};
-
-const RULES_FIND = {
-  red: [/won'?t\s+accept|force|belong/i],
-  yellow: [/beg|wait\s+forever/i],
-  green: [/respect|let\s+you\s+go|accept/i]
-};
-
-const RULES_HANDLE = {
-  red: [/control|own|punish/i],
-  yellow: [/try\s+my\s+best|adjust/i],
-  green: [/communicate|patience|boundaries/i]
-};
+$("#personalBtn").addEventListener("click", () => {
+  hearts = 3;
+  hudOn();
+  mainIndex = 0;
+  renderMainQuestion();
+  showOnly(main);
+});
 
 /* ======================
    QUESTIONS
 ====================== */
-const QUESTIONS = [
+const MAIN = [
   {
-    type: "choice",
     q: "When I say I’m not ready today…",
     a: [
-      { t: "I respect your pace.", d: 0 },
-      { t: "I feel frustrated.", d: 1 },
-      { t: "I pressure you.", d: 2 }
+      { t: "I respect your pace and don’t make you feel guilty.", d: 0 },
+      { t: "I try to understand, but I still feel frustrated.", d: 1 },
+      { t: "I take it personally and pressure you.", d: 2 }
     ]
   },
   {
-    type: "text",
-    q: "I will be leaving after college. How do you feel?",
-    rules: RULES_LEAVING
-  },
-  {
-    type: "choice",
-    q: "If I’m not allowed a boyfriend yet…",
+    q: "When I become quiet instead of expressive…",
     a: [
-      { t: "I respect it.", d: 0 },
-      { t: "I struggle quietly.", d: 1 },
-      { t: "Rules shouldn’t apply.", d: 2 }
+      { t: "I stay present without forcing words.", d: 0 },
+      { t: "I keep asking until it becomes pressure.", d: 1 },
+      { t: "I pull away and make you feel alone.", d: 2 }
     ]
-  },
-  {
-    type: "text",
-    q: "If I asked you to find someone else…",
-    rules: RULES_FIND
-  },
-  {
-    type: "text",
-    q: "I’m hard to handle. How would you stay?",
-    rules: RULES_HANDLE
   }
 ];
 
-let index = 0;
+let mainIndex = 0;
 
-function renderQuestion() {
-  const q = QUESTIONS[index];
+function renderMainQuestion() {
+  const q = MAIN[mainIndex];
   $("#mqPrompt").textContent = q.q;
   $("#mqChoices").innerHTML = "";
   showMsg($("#mqMsg"), "");
 
-  if (q.type === "text") {
-    const ta = document.createElement("textarea");
-    ta.className = "input";
-    ta.rows = 5;
-
-    const btn = document.createElement("button");
-    btn.className = "btn glow";
-    btn.textContent = "Continue";
+  q.a.forEach(choice => {
+    const btn = document.createElement("div");
+    btn.className = "choice";
+    btn.textContent = choice.t;
 
     btn.onclick = () => {
-      const v = ta.value.trim();
-      if (v.length < MIN_TEXT_LEN) {
-        showMsg($("#mqMsg"), "Please explain more.", "error");
-        return;
+      if (choice.d > 0) {
+        hearts = Math.max(0, hearts - choice.d);
+        renderHearts();
       }
-      hearts = Math.max(0, hearts - scoreByRules(v, q.rules));
-      renderHearts();
-      index++;
-      next();
+      mainIndex++;
+      mainIndex < MAIN.length ? renderMainQuestion() : endQuestions();
     };
 
-    $("#mqChoices").append(ta, btn);
-    return;
-  }
-
-  q.a.forEach(c => {
-    const div = document.createElement("div");
-    div.className = "choice";
-    div.textContent = c.t;
-    div.onclick = () => {
-      hearts = Math.max(0, hearts - c.d);
-      renderHearts();
-      index++;
-      next();
-    };
-    $("#mqChoices").appendChild(div);
+    $("#mqChoices").appendChild(btn);
   });
 }
 
-function next() {
-  if (index < QUESTIONS.length) {
-    renderQuestion();
+function endQuestions() {
+  showOnly(afterMain);
+  $("#toGameBtn").classList.toggle("hidden", hearts < 2);
+
+  if (hearts <= 0) {
+    $("#afterMainTitle").textContent = "I don’t think you meant to hurt my heart…";
+    $("#afterMainBody").textContent = "But I need someone who protects it.";
     return;
   }
 
-  showOnly(afterMain);
-  const btn = $("#toGameBtn");
-
-  if (hearts <= 1) return;
+  if (hearts === 1) {
+    $("#afterMainTitle").textContent = "Not yet.";
+    $("#afterMainBody").textContent = "But thank you for trying.";
+    return;
+  }
 
   $("#afterMainTitle").textContent = "Continue.";
-  btn.classList.remove("hidden");
+  $("#afterMainBody").textContent = "";
 }
 
 /* ======================
-   GAME
+   HOLD GAME
 ====================== */
-$("#toGameBtn").onclick = () => {
-  showOnly(game);
-};
+$("#toGameBtn").addEventListener("click", () => showOnly(game));
+
+const holdBtn = $("#holdBtn");
+const holdProgress = $("#holdProgress");
 
 let holding = false;
-let progress = 0;
-let timer;
+let pct = 0;
+let timer = null;
 
-const bar = $("#holdProgress");
-const holdBtn = $("#holdBtn");
-
-holdBtn.onmousedown = start;
-holdBtn.onmouseup = stop;
-holdBtn.ontouchstart = e => { e.preventDefault(); start(); };
-holdBtn.ontouchend = e => { e.preventDefault(); stop(); };
-
-function start() {
+function startHold() {
   if (holding) return;
   holding = true;
   timer = setInterval(() => {
-    progress += 1;
-    bar.style.width = progress + "%";
-    if (progress >= 100) {
-      clearInterval(timer);
-      showOnly(scroll);
-    }
+    pct += 1;
+    holdProgress.style.width = `${pct}%`;
+    if (pct >= 100) winHold();
   }, 30);
 }
 
-function stop() {
+function stopHold() {
   if (!holding) return;
   clearInterval(timer);
+  pct = 0;
   holding = false;
-  progress = 0;
-  bar.style.width = "0%";
+  holdProgress.style.width = "0%";
 }
 
+function winHold() {
+  clearInterval(timer);
+  showOnly(scroll);
+}
+
+holdBtn.addEventListener("mousedown", startHold);
+holdBtn.addEventListener("mouseup", stopHold);
+holdBtn.addEventListener("mouseleave", stopHold);
+holdBtn.addEventListener("touchstart", e => { e.preventDefault(); startHold(); }, { passive: false });
+holdBtn.addEventListener("touchend", e => { e.preventDefault(); stopHold(); }, { passive: false });
+
 /* ======================
-   SCROLL
+   SCROLL (LONG LETTER + ANIMATION)
 ====================== */
-$("#openScroll").onclick = () => {
+const LETTER = `
+I don’t think I ever wanted a simple yes or no.
+
+I wanted to see how you handle the parts that take time.
+The parts that don’t give answers right away.
+The moments where patience matters more than certainty.
+
+I notice how people act when things slow down.
+When there’s no instant reward.
+When all they can do is stay — or walk away.
+
+If you’re still here,
+it means you didn’t rush.
+You didn’t force an answer.
+You didn’t treat this like something to win.
+
+And that tells me more than words ever could.
+
+This isn’t a promise.
+This isn’t a rejection either.
+
+It’s just me saying…
+I see you trying to understand,
+and that matters more than you think.
+`.trim();
+
+$("#openScroll").addEventListener("click", () => {
+  typeLetter();
   $("#toFinalBtn").classList.remove("hidden");
-};
+});
 
-$("#toFinalBtn").onclick = () => {
-  showOnly(final);
-  startPhotoTimer();
-};
-
-/* ======================
-   FINAL TIMER
-====================== */
-function startPhotoTimer() {
-  const bar = $("#photoTimerBar");
-  const total = 3 * 60 * 1000;
-  const start = Date.now();
+function typeLetter() {
+  const el = $("#letter");
+  el.textContent = "";
+  let i = 0;
 
   const t = setInterval(() => {
-    const left = Math.max(0, total - (Date.now() - start));
-    bar.style.transform = `scaleX(${left / total})`;
-    if (left <= 0) {
-      clearInterval(t);
-      showMsg($("#finalMsg"), "Some things aren’t meant to be rushed.", "error");
-    }
-  }, 200);
+    el.textContent += LETTER[i++] || "";
+    if (i >= LETTER.length) clearInterval(t);
+  }, 18);
 }
+
+/* ======================
+   FINAL (PHOTO STAGE)
+====================== */
+$("#toFinalBtn").addEventListener("click", () => showOnly(final));
+
+$("#photoCard").addEventListener("click", () => {
+  $("#photoCard").classList.toggle("flipped");
+});
 
 /* ======================
    BOOT
 ====================== */
-(async function () {
-  if (!token) return showOnly(blocked);
-
-  const res = await fetch(`/api/validate-token?token=${encodeURIComponent(token)}`);
-  const data = await res.json();
-
-  if (!data.ok || data.stage !== "continue") {
+(async function boot() {
+  const ok = await validateToken();
+  if (!ok) {
     showOnly(blocked);
     return;
   }
 
-  hudOn();
   showOnly(personal);
-
-  $("#personalBtn").onclick = () => {
-    index = 0;
-    renderQuestion();
-    showOnly(main);
-  };
 })();
