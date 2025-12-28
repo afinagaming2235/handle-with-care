@@ -43,6 +43,7 @@ const msgEl = document.getElementById("msg");
 ====================== */
 let index = 0;
 let timeLeft = TOTAL_TIME;
+let timerInterval = null;
 
 /* ======================
    HELPERS
@@ -58,14 +59,20 @@ function formatTime(sec) {
 /* ======================
    TIMER
 ====================== */
-setInterval(() => {
-  timeLeft--;
+function startTimer() {
   timerEl.textContent = formatTime(timeLeft);
-  if (timeLeft <= 0) {
-    submitBtn.disabled = true;
-    showMsg(msgEl, "Time’s up. This stops here.", "error");
-  }
-}, 1000);
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = formatTime(Math.max(0, timeLeft));
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      submitBtn.disabled = true;
+      showMsg(msgEl, "Time’s up. This stops here.", "error");
+    }
+  }, 1000);
+}
 
 /* ======================
    QUESTION
@@ -77,6 +84,9 @@ function renderQuestion() {
 }
 
 submitBtn.onclick = async () => {
+  // if time expired, block
+  if (timeLeft <= 0) return;
+
   const answer = normalize(inputEl.value);
   const correct = normalize(QUESTIONS[index].a);
 
@@ -86,11 +96,20 @@ submitBtn.onclick = async () => {
   index++;
   if (index < QUESTIONS.length) return renderQuestion();
 
+  // ✅ ALL CORRECT
+  clearInterval(timerInterval);
   submitBtn.disabled = true;
   showMsg(msgEl, "Correct. Another link will be sent to your email.", "ok");
 
-  await fetch("/api/send-next-link", { method: "POST" });
+  // ✅ THIS IS WHERE IT GOES (after all answers are correct)
+  await fetch("/api/send-next-link", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  });
 };
 
+/* ======================
+   BOOT
+====================== */
 renderQuestion();
-timerEl.textContent = formatTime(timeLeft);
+startTimer();
