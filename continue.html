@@ -4,68 +4,74 @@
   <meta charset="utf-8">
   <title>Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 
 <body>
 
-  <!-- HEARTS -->
-  <div id="hearts" class="hearts hidden"></div>
+  <!-- Background layers (same as others) -->
+  <div id="bg"></div>
+  <div id="fog"></div>
+  <div id="noise"></div>
+  <div id="vignette"></div>
 
-  <main class="card wide">
+  <!-- APP WRAPPER (THIS WAS MISSING) -->
+  <div class="app">
 
-    <!-- BLOCKED -->
-    <section id="blocked" class="hidden">
-      <p class="title">Access denied.</p>
-    </section>
+    <!-- HEARTS -->
+    <div id="hearts" class="hearts hidden"></div>
 
-    <!-- 🔹 START HERE (NO SONG ANYMORE) -->
+    <main class="card wide">
 
-    <section id="personal" class="hidden">
-      <p>You have 3 hearts. Every choice matters.</p>
-      <button id="personalBtn" class="btn glow">I understand</button>
-    </section>
+      <!-- BLOCKED -->
+      <section id="blocked" class="hidden">
+        <p class="title">Access denied.</p>
+      </section>
 
-    <section id="mainQuestions" class="hidden">
-      <p id="mqPrompt"></p>
-      <div id="mqChoices"></div>
-      <p id="mqMsg" class="msg"></p>
-    </section>
+      <!-- START -->
+      <section id="personal" class="hidden">
+        <p>You have 3 hearts. Every choice matters.</p>
+        <button id="personalBtn" class="btn glow">I understand</button>
+      </section>
 
-    <section id="afterMain" class="hidden">
-      <p id="afterMainTitle"></p>
-      <p id="afterMainBody"></p>
-      <button id="toGameBtn" class="btn glow hidden">Continue</button>
-    </section>
+      <section id="mainQuestions" class="hidden">
+        <p id="mqPrompt"></p>
+        <div id="mqChoices"></div>
+        <p id="mqMsg" class="msg"></p>
+      </section>
 
-    <section id="game" class="hidden">
-      <div class="hold-box">
-        <div id="holdProgress" class="hold-progress"></div>
-        <button id="holdBtn" class="hold-btn">HOLD</button>
-      </div>
-    </section>
+      <section id="afterMain" class="hidden">
+        <p id="afterMainTitle"></p>
+        <p id="afterMainBody"></p>
+        <button id="toGameBtn" class="btn glow hidden">Continue</button>
+      </section>
 
-    <section id="scroll" class="hidden">
-      <button id="openScroll" class="btn">Open</button>
-      <div id="letter"></div>
-      <button id="toFinalBtn" class="btn glow hidden">Continue</button>
-    </section>
+      <section id="game" class="hidden">
+        <div class="hold-box">
+          <div id="holdProgress" class="hold-progress"></div>
+          <button id="holdBtn" class="hold-btn">HOLD</button>
+        </div>
+      </section>
 
-    <section id="final" class="hidden">
-      <div class="timerTrack">
-        <div id="photoTimerBar" class="timerBar"></div>
-      </div>
-      <div id="photoCard" class="photo-card">
-        <img src="/assets/photo.jpg" alt="photo">
-        <p id="finalMsg"></p>
-      </div>
-    </section>
+      <section id="scroll" class="hidden">
+        <button id="openScroll" class="btn">Open</button>
+        <div id="letter"></div>
+        <button id="toFinalBtn" class="btn glow hidden">Continue</button>
+      </section>
 
-  </main>
+      <section id="final" class="hidden">
+        <div class="timerTrack">
+          <div id="photoTimerBar" class="timerBar"></div>
+        </div>
+        <div id="photoCard" class="photo-card">
+          <img src="/assets/photo.jpg" alt="photo">
+          <p id="finalMsg"></p>
+        </div>
+      </section>
 
-  <!-- 🔹 ONLY ONE SCRIPT NOW -->
+    </main>
+  </div>
+
   <script type="module" src="/js/continue.js"></script>
-
 </body>
 </html>
