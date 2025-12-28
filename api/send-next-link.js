@@ -5,7 +5,11 @@ const EMAIL = "202510576@gordoncollege.edu.ph";
 const TTL = 60 * 60; // 1 hour
 
 function base64url(input) {
-  return Buffer.from(input).toString("base64url");
+  return Buffer.from(input)
+    .toString("base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
 }
 
 function sign(data, secret) {
@@ -15,23 +19,24 @@ function sign(data, secret) {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const secret = process.env.TOKEN_SECRET;
-  const app = process.env.APP_URL;
+  const TOKEN_SECRET = process.env.TOKEN_SECRET;
+  const APP_URL = process.env.APP_URL;
 
-  if (!secret || !app) {
+  if (!TOKEN_SECRET || !APP_URL) {
     return res.status(500).json({ ok: false });
   }
 
-  const payload = {
+  const payloadObj = {
     email: EMAIL,
-    stage: "continue", // ✅ FIXED
+    stage: "continue", // 🔥 MUST MATCH continue.js
     exp: Math.floor(Date.now() / 1000) + TTL
   };
 
-  const encoded = base64url(JSON.stringify(payload));
-  const token = `${encoded}.${sign(encoded, secret)}`;
+  const payload = base64url(JSON.stringify(payloadObj));
+  const token = `${payload}.${sign(payload, TOKEN_SECRET)}`;
 
-  const url = `${app.replace(/\/$/, "")}/continue.html?token=${token}`; // ✅ FIXED
+  const continueUrl =
+    `${APP_URL.replace(/\/$/, "")}/continue.html?token=${encodeURIComponent(token)}`;
 
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -47,7 +52,7 @@ export default async function handler(req, res) {
     from: `"Private" <${process.env.MAIL_FROM || process.env.SMTP_USER}>`,
     to: EMAIL,
     subject: "Continue",
-    text: `You may continue here:\n\n${url}`
+    text: `You may continue here:\n\n${continueUrl}`
   });
 
   res.json({ ok: true });
