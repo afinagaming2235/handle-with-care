@@ -49,16 +49,17 @@ html, body {
 /* ===== HEARTS ===== */
 .hearts {
   position: fixed;
-  top: 14px;
-  left: 14px;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  gap: 6px;
-  z-index: 10;
+  gap: 10px;
+  z-index: 52;
 }
 
 .heart {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
 }
 
 /* ===== LAYOUT ===== */
@@ -142,13 +143,15 @@ html, body {
 
 /* ===== BUTTONS ===== */
 .btn {
-  padding: 14px;
+  padding: 14px 22px;
   border-radius: 999px;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: #fff;
   cursor: pointer;
   text-align: center;
+  margin: 20px auto 0; 
+  display: block; 
 }
 
 .btn.glow {
@@ -174,15 +177,19 @@ html, body {
 }
 
 .choice {
-  padding: 14px;
+  padding: 14px 18px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.15s;
+  margin: 15px auto 0; 
+  max-width: 520px;
+  text-align: center;
 }
 
 .choice:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
 }
 
 /* ===== HOLD GAME ===== */
