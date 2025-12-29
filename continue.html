@@ -9,73 +9,78 @@
 
 <body>
 
-  <!-- Background layers (same as others) -->
-  <div id="bg"></div>
-  <div id="fog"></div>
-  <div id="noise"></div>
-  <div id="vignette"></div>
+<div id="bg"></div>
+<div id="fog"></div>
+<div id="noise"></div>
+<div id="vignette"></div>
 
-  <!-- APP WRAPPER (THIS WAS MISSING) -->
-  <div class="app">
+<div class="app">
 
-    <!-- HEARTS -->
-    <div id="hearts" class="hearts hidden"></div>
+  <!-- HEARTS -->
+  <div id="hearts" class="hearts hidden"></div>
 
-    <main class="card wide">
+  <main class="card wide stack">
 
-      <!-- BLOCKED -->
-      <section id="blocked" class="hidden">
-        <p class="title">Access denied.</p>
-      </section>
+    <section id="blocked" class="hidden">
+      <p class="title">Access denied.</p>
+    </section>
 
-      <!-- START -->
-      <section id="personal" class="hidden">
-        <p>You have 3 hearts. Every choice matters.</p>
-        <button id="personalBtn" class="btn glow">I understand</button>
-      </section>
+    <section id="personal" class="hidden">
+      <p>You have 3 hearts. Every choice matters.</p>
+      <button id="personalBtn" class="btn glow">I understand</button>
+    </section>
 
-      <section id="mainQuestions" class="hidden">
-        <p id="mqPrompt"></p>
-        <div id="mqChoices"></div>
-        <p id="mqMsg" class="msg"></p>
-      </section>
+    <section id="mainQuestions" class="hidden">
+      <p id="mqPrompt" class="question big"></p>
+      <div id="mqChoices"></div>
+      <p id="mqMsg" class="msg"></p>
+    </section>
 
-      <section id="afterMain" class="hidden">
-        <p id="afterMainTitle"></p>
-        <p id="afterMainBody"></p>
-        <button id="toGameBtn" class="btn glow hidden">Continue</button>
-      </section>
+    <section id="afterMain" class="hidden">
+      <p id="afterMainTitle" class="title"></p>
+      <p id="afterMainBody"></p>
+      <button id="toGameBtn" class="btn glow hidden">Continue</button>
+    </section>
 
-      <section id="game" class="hidden">
-        <div class="hold-box">
-          <div id="holdProgress" class="hold-progress"></div>
-          <button id="holdBtn" class="hold-btn">HOLD</button>
+    <section id="game" class="hidden">
+      <div class="hold-box">
+        <div id="holdProgress" class="hold-progress"></div>
+        <button id="holdBtn" class="hold-btn">HOLD</button>
+      </div>
+    </section>
+
+    <section id="scroll" class="hidden">
+      <button id="openScroll" class="btn">Open</button>
+      <div class="paper scroll-paper">
+        <div id="letter" class="letter"></div>
+      </div>
+      <button id="toFinalBtn" class="btn glow hidden">Continue</button>
+    </section>
+
+    <section id="final" class="hidden">
+      <p class="subtitle center">
+        You have 3 minutes.  
+        Find the right card.
+      </p>
+
+      <div class="timerTrack">
+        <div id="photoTimerBar" class="timerBar"></div>
+      </div>
+
+      <div id="cardGrid" class="grid"></div>
+
+      <div id="photoStage" class="hidden">
+        <div id="scratchWrap" class="photo-card">
+          <img src="/assets/photo.jpg" class="photo-img">
+          <canvas id="scratch"></canvas>
         </div>
-      </section>
+        <p id="finalMsg" class="msg"></p>
+      </div>
+    </section>
 
-      <section id="scroll" class="hidden">
-        <button id="openScroll" class="btn">Open</button>
+  </main>
+</div>
 
-        <div class="paper scroll-paper">
-          <div id="letter" class="letter"></div>
-        </div>
-
-        <button id="toFinalBtn" class="btn glow hidden">Continue</button>
-      </section>
-
-      <section id="final" class="hidden">
-        <div class="timerTrack">
-          <div id="photoTimerBar" class="timerBar"></div>
-        </div>
-        <div id="photoCard" class="photo-card">
-          <img src="/assets/20251206_190038.jpg" alt="photo">
-          <p id="finalMsg"></p>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <script type="module" src="/js/continue.js"></script>
+<script type="module" src="/js/continue.js"></script>
 </body>
 </html>
