@@ -1,86 +1,154 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Questions</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/css/styles.css">
+  <meta charset="utf-8" />
+  <title>Continue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
 
 <body>
+  <!-- Background layers -->
+  <div id="bg"></div>
+  <div id="fog"></div>
+  <div id="noise"></div>
+  <div id="vignette"></div>
 
-<div id="bg"></div>
-<div id="fog"></div>
-<div id="noise"></div>
-<div id="vignette"></div>
+  <div class="app">
+    <!-- HEARTS HUD -->
+    <div id="hearts" class="hearts hidden"></div>
 
-<div class="app">
+    <main class="card wide">
 
-  <!-- HEARTS -->
-  <div id="hearts" class="hearts hidden"></div>
+      <!-- BLOCKED -->
+      <section id="blocked" class="hidden">
+        <p class="title">Access denied.</p>
+      </section>
 
-  <main class="card wide stack">
+      <!-- HEART INSTRUCTION -->
+      <section id="personal" class="hidden">
+        <div class="stack wide">
+          <p class="title">Before you continue.</p>
+          <p class="subtitle">
+            You have <b>3 hearts</b>.<br />
+            Some answers can hurt me.<br />
+            If you hurt me too much… this stops here.
+          </p>
 
-    <section id="blocked" class="hidden">
-      <p class="title">Access denied.</p>
-    </section>
-
-    <section id="personal" class="hidden">
-      <p>You have 3 hearts. Every choice matters.</p>
-      <button id="personalBtn" class="btn glow">I understand</button>
-    </section>
-
-    <section id="mainQuestions" class="hidden">
-      <p id="mqPrompt" class="question big"></p>
-      <div id="mqChoices"></div>
-      <p id="mqMsg" class="msg"></p>
-    </section>
-
-    <section id="afterMain" class="hidden">
-      <p id="afterMainTitle" class="title"></p>
-      <p id="afterMainBody"></p>
-      <button id="toGameBtn" class="btn glow hidden">Continue</button>
-    </section>
-
-    <section id="game" class="hidden">
-      <div class="hold-box">
-        <div id="holdProgress" class="hold-progress"></div>
-        <button id="holdBtn" class="hold-btn">HOLD</button>
-      </div>
-    </section>
-
-    <section id="scroll" class="hidden">
-      <button id="openScroll" class="btn">Open</button>
-      <div class="paper scroll-paper">
-        <div id="letter" class="letter"></div>
-      </div>
-      <button id="toFinalBtn" class="btn glow hidden">Continue</button>
-    </section>
-
-    <section id="final" class="hidden">
-      <p class="subtitle center">
-        You have 3 minutes.  
-        Find the right card.
-      </p>
-
-      <div class="timerTrack">
-        <div id="photoTimerBar" class="timerBar"></div>
-      </div>
-
-      <div id="cardGrid" class="grid"></div>
-
-      <div id="photoStage" class="hidden">
-        <div id="scratchWrap" class="photo-card">
-          <img src="/assets/photo.jpg" class="photo-img">
-          <canvas id="scratch"></canvas>
+          <button id="personalBtn" class="btn glow">I understand</button>
+          <p id="personalMsg" class="msg"></p>
         </div>
-        <p id="finalMsg" class="msg"></p>
-      </div>
-    </section>
+      </section>
 
-  </main>
-</div>
+      <!-- QUESTIONS -->
+      <section id="mainQuestions" class="hidden">
+        <div class="stack wide">
+          <p id="mqPrompt" class="question big"></p>
+          <div id="mqChoices"></div>
+          <p id="mqMsg" class="msg"></p>
+        </div>
+      </section>
 
-<script type="module" src="/js/continue.js"></script>
+      <!-- AFTER QUESTIONS -->
+      <section id="afterMain" class="hidden">
+        <div class="stack wide">
+          <p id="afterMainTitle" class="title"></p>
+          <p id="afterMainBody" class="subtitle"></p>
+          <button id="toGameBtn" class="btn glow hidden">Continue</button>
+        </div>
+      </section>
+
+      <!-- HOLD GAME -->
+      <section id="game" class="hidden">
+        <div class="stack wide">
+          <p class="title">One more thing.</p>
+          <p class="subtitle">Hold it. Don’t let go.</p>
+
+          <div class="hold-box">
+            <div id="holdProgress" class="hold-progress"></div>
+            <button id="holdBtn" class="hold-btn">HOLD</button>
+          </div>
+
+          <p class="note">If you let go early… you lose a heart.</p>
+        </div>
+      </section>
+
+      <!-- AFTER GAME -->
+      <section id="afterGame" class="hidden">
+        <div class="stack wide">
+          <p id="afterGameTitle" class="title"></p>
+          <p id="afterGameBody" class="subtitle"></p>
+          <button id="toScrollBtn" class="btn glow hidden">Continue</button>
+        </div>
+      </section>
+
+      <!-- SCROLL LETTER -->
+      <section id="scroll" class="hidden">
+        <div class="stack wide">
+          <p class="title">Open it.</p>
+          <p class="subtitle">Read it slowly.</p>
+
+          <button id="openScroll" class="btn">Open</button>
+
+          <div id="letterWrap" class="paper scroll-paper hidden">
+            <div id="letter" class="letter"></div>
+          </div>
+
+          <button id="toFinalBtn" class="btn glow hidden">Continue</button>
+        </div>
+      </section>
+
+      <!-- FINAL: 3-LEVEL CARD FIND GAME (NO HEARTS) -->
+      <section id="final" class="hidden">
+        <div class="stack wide">
+          <p class="title">Last thing.</p>
+          <p id="finalInstruction" class="subtitle">
+            You have <b>3 minutes</b>.<br />
+            Find the correct card before time runs out.
+          </p>
+
+          <!-- timer bar -->
+          <div class="timerTrack">
+            <div id="photoTimerBar" class="timerBar"></div>
+          </div>
+
+          <p id="levelMsg" class="msg"></p>
+
+          <!-- GRID GAME -->
+          <div id="grid" class="grid"></div>
+
+          <!-- REWARD WORDS -->
+          <p id="rewardText" class="title hidden"></p>
+
+          <!-- PHOTO CARD (LEVEL 3) -->
+          <div id="photoStage" class="hidden">
+            <p class="subtitle">
+              You found it.<br />
+              Flip the card… then scratch the back.
+            </p>
+
+            <div id="photoCard" class="photo-card">
+              <!-- front -->
+              <div class="card-front">
+                <img class="photo-img" src="/assets/cover.jpg" alt="cover" />
+              </div>
+
+              <!-- back -->
+              <div class="card-back">
+                <canvas id="scratch"></canvas>
+                <div id="revealText">Scratch to reveal</div>
+                <img id="hiddenPhoto" class="photo-img" src="/assets/20251206_190038.jpg" alt="hidden" />
+              </div>
+            </div>
+
+            <p id="finalMsg" class="msg"></p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script type="module" src="/js/continue.js"></script>
 </body>
 </html>
