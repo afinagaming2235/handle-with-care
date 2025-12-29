@@ -1,241 +1,266 @@
 import { $, showMsg, getTokenFromUrl } from "./shared.js";
 
 /* ======================
-   TOKEN VALIDATION
+   TOKEN CHECK
 ====================== */
-const token = getTokenFromUrl();
+(async function () {
+  const token = getTokenFromUrl();
+  if (!token) return showOnly($("#blocked"));
 
-async function validateToken() {
-  if (!token) return false;
   const res = await fetch(`/api/validate-token?token=${encodeURIComponent(token)}`);
   const data = await res.json().catch(() => null);
-  return data && data.ok && data.stage === "continue";
-}
+
+  if (!data || !data.ok || data.stage !== "continue")
+    return showOnly($("#blocked"));
+
+  showOnly($("#personal"));
+})();
 
 /* ======================
    SECTIONS
 ====================== */
-const blocked = $("#blocked");
-const personal = $("#personal");
-const main = $("#mainQuestions");
-const afterMain = $("#afterMain");
-const game = $("#game");
-const scroll = $("#scroll");
-const final = $("#final");
+const sections = [
+  "blocked","personal","mainQuestions",
+  "afterMain","game","scroll","final"
+].map(id => $(`#${id}`));
 
-function showOnly(section) {
-  [blocked, personal, main, afterMain, game, scroll, final]
-    .forEach(s => s.classList.add("hidden"));
-  section.classList.remove("hidden");
+function showOnly(el) {
+  sections.forEach(s => s.classList.add("hidden"));
+  el.classList.remove("hidden");
 }
 
 /* ======================
-   HEARTS HUD
+   HEARTS
 ====================== */
-const heartsWrap = $("#hearts");
-const HEART_OK = "/assets/heart.svg";
-const HEART_BROKEN = "/assets/heart-broken.svg";
-
 let hearts = 3;
+const heartsWrap = $("#hearts");
 
 function renderHearts() {
   heartsWrap.innerHTML = "";
   for (let i = 0; i < 3; i++) {
     const img = document.createElement("img");
-    img.src = i < hearts ? HEART_OK : HEART_BROKEN;
+    img.src = i < hearts ? "/assets/heart.svg" : "/assets/heart-broken.svg";
     img.className = "heart";
     heartsWrap.appendChild(img);
   }
 }
 
-function hudOn() {
+$("#personalBtn").onclick = () => {
   heartsWrap.classList.remove("hidden");
   renderHearts();
-}
-
-/* ======================
-   HEART INSTRUCTIONS
-====================== */
-$("#personalBtn").addEventListener("click", () => {
-  hearts = 3;
-  hudOn();
-  mainIndex = 0;
-  renderMainQuestion();
-  showOnly(main);
-});
+  index = 0;
+  renderQuestion();
+  showOnly($("#mainQuestions"));
+};
 
 /* ======================
    QUESTIONS
 ====================== */
+const allAnswers = [];
+const MIN = 80, MAX = 200;
+
+const HURT = /you owe|after all|stay for me|don’t leave|if you love me|force/i;
+
 const MAIN = [
-  {
-    q: "When I say I’m not ready today…",
-    a: [
-      { t: "I respect your pace and don’t make you feel guilty.", d: 0 },
-      { t: "I try to understand, but I still feel frustrated.", d: 1 },
-      { t: "I take it personally and pressure you.", d: 2 }
-    ]
-  },
-  {
-    q: "When I become quiet instead of expressive…",
-    a: [
-      { t: "I stay present without forcing words.", d: 0 },
-      { t: "I keep asking until it becomes pressure.", d: 1 },
-      { t: "I pull away and make you feel alone.", d: 2 }
-    ]
-  }
+  { type:"choice", q:"When I say I’m not ready today…",
+    a:[
+      {t:"I respect your pace.",d:0},
+      {t:"I struggle but stay.",d:1},
+      {t:"I pressure you.",d:2}
+    ]},
+  { type:"choice", q:"When I become quiet…",
+    a:[
+      {t:"I stay present.",d:0},
+      {t:"I push.",d:1},
+      {t:"I withdraw.",d:2}
+    ]},
+  { type:"text", q:"I will be leaving after college. How do you feel?" },
+  { type:"text", q:"If I asked you to find someone else…" },
+  { type:"text", q:"I’m hard to handle. How would you stay?" }
 ];
 
-let mainIndex = 0;
+let index = 0;
 
-function renderMainQuestion() {
-  const q = MAIN[mainIndex];
+function renderQuestion() {
+  const q = MAIN[index];
   $("#mqPrompt").textContent = q.q;
   $("#mqChoices").innerHTML = "";
-  showMsg($("#mqMsg"), "");
+  showMsg($("#mqMsg"),"");
 
-  q.a.forEach(choice => {
-    const btn = document.createElement("div");
-    btn.className = "choice";
-    btn.textContent = choice.t;
-
-    btn.onclick = () => {
-      if (choice.d > 0) {
-        hearts = Math.max(0, hearts - choice.d);
+  if (q.type === "choice") {
+    q.a.forEach(c => {
+      const d = document.createElement("div");
+      d.className = "choice";
+      d.textContent = c.t;
+      d.onclick = () => {
+        hearts = Math.max(0, hearts - c.d);
         renderHearts();
-      }
-      mainIndex++;
-      mainIndex < MAIN.length ? renderMainQuestion() : endQuestions();
-    };
+        allAnswers.push({q:q.q,a:c.t});
+        next();
+      };
+      $("#mqChoices").appendChild(d);
+    });
+    return;
+  }
 
-    $("#mqChoices").appendChild(btn);
-  });
+  const ta = document.createElement("textarea");
+  ta.className = "input";
+  ta.rows = 6;
+
+  const btn = document.createElement("button");
+  btn.className = "btn glow";
+  btn.textContent = "Continue";
+
+  btn.onclick = () => {
+    const text = ta.value.trim();
+    const wc = text.split(/\s+/).length;
+    if (wc < MIN || wc > MAX)
+      return showMsg($("#mqMsg"),`80–200 words required.`,"error");
+
+    if (HURT.test(text)) {
+      hearts = Math.max(0, hearts - 1);
+      renderHearts();
+    }
+
+    allAnswers.push({q:q.q,a:text});
+    next();
+  };
+
+  $("#mqChoices").append(ta,btn);
 }
 
-function endQuestions() {
-  showOnly(afterMain);
-  $("#toGameBtn").classList.toggle("hidden", hearts < 2);
+function next() {
+  index++;
+  index < MAIN.length ? renderQuestion() : afterQuestions();
+}
 
-  if (hearts <= 0) {
-    $("#afterMainTitle").textContent = "I don’t think you meant to hurt my heart…";
-    $("#afterMainBody").textContent = "But I need someone who protects it.";
-    return;
-  }
-
-  if (hearts === 1) {
-    $("#afterMainTitle").textContent = "Not yet.";
-    $("#afterMainBody").textContent = "But thank you for trying.";
-    return;
-  }
-
-  $("#afterMainTitle").textContent = "Continue.";
-  $("#afterMainBody").textContent = "";
+function afterQuestions() {
+  showOnly($("#afterMain"));
+  $("#afterMainTitle").textContent =
+    hearts > 0 ? "You didn’t rush." : "Some answers hurt.";
+  $("#toGameBtn").classList.toggle("hidden", hearts <= 0);
 }
 
 /* ======================
    HOLD GAME
 ====================== */
-$("#toGameBtn").addEventListener("click", () => showOnly(game));
+$("#toGameBtn").onclick = () => showOnly($("#game"));
 
-const holdBtn = $("#holdBtn");
-const holdProgress = $("#holdProgress");
-
-let holding = false;
-let pct = 0;
-let timer = null;
-
-function startHold() {
-  if (holding) return;
-  holding = true;
+let pct = 0, timer;
+$("#holdBtn").onmousedown = () => {
   timer = setInterval(() => {
     pct += 1;
-    holdProgress.style.width = `${pct}%`;
-    if (pct >= 100) winHold();
+    $("#holdProgress").style.width = pct + "%";
+    if (pct >= 100) {
+      clearInterval(timer);
+      showOnly($("#scroll"));
+    }
   }, 30);
-}
-
-function stopHold() {
-  if (!holding) return;
-  clearInterval(timer);
-  pct = 0;
-  holding = false;
-  holdProgress.style.width = "0%";
-}
-
-function winHold() {
-  clearInterval(timer);
-  showOnly(scroll);
-}
-
-holdBtn.addEventListener("mousedown", startHold);
-holdBtn.addEventListener("mouseup", stopHold);
-holdBtn.addEventListener("mouseleave", stopHold);
-holdBtn.addEventListener("touchstart", e => { e.preventDefault(); startHold(); }, { passive: false });
-holdBtn.addEventListener("touchend", e => { e.preventDefault(); stopHold(); }, { passive: false });
+};
+$("#holdBtn").onmouseup = () => clearInterval(timer);
 
 /* ======================
-   SCROLL (LONG LETTER + ANIMATION)
+   SCROLL LETTER (LONG VERSION)
 ====================== */
 const LETTER = `
-I don’t think I ever wanted a simple yes or no.
+I didn’t want a yes.
+I didn’t want a no.
 
-I wanted to see how you handle the parts that take time.
-The parts that don’t give answers right away.
-The moments where patience matters more than certainty.
+I wanted to see how you speak
+when the answer isn’t obvious.
 
-I notice how people act when things slow down.
-When there’s no instant reward.
-When all they can do is stay — or walk away.
+Some people rush.
+Some people pressure.
+Some people stay only if it’s easy.
 
-If you’re still here,
-it means you didn’t rush.
-You didn’t force an answer.
-You didn’t treat this like something to win.
+If you’re here,
+it means you didn’t force your way through.
 
-And that tells me more than words ever could.
+You stayed.
+You waited.
+You listened.
 
-This isn’t a promise.
-This isn’t a rejection either.
-
-It’s just me saying…
-I see you trying to understand,
-and that matters more than you think.
+That already tells me something.
 `.trim();
 
-$("#openScroll").addEventListener("click", () => {
-  typeLetter();
-  $("#toFinalBtn").classList.remove("hidden");
-});
-
-function typeLetter() {
+$("#openScroll").onclick = () => {
   const el = $("#letter");
   el.textContent = "";
   let i = 0;
-
   const t = setInterval(() => {
     el.textContent += LETTER[i++] || "";
     if (i >= LETTER.length) clearInterval(t);
   }, 18);
+  $("#toFinalBtn").classList.remove("hidden");
+};
+
+$("#toFinalBtn").onclick = () => startFinal();
+
+/* ======================
+   FINAL CARD GAME
+====================== */
+function startFinal() {
+  showOnly($("#final"));
+  startTimer();
+  buildGrid();
+}
+
+let level = 0;
+const words = ["my","answer is",""];
+
+function buildGrid() {
+  const grid = $("#cardGrid");
+  grid.innerHTML = "";
+  for (let i=0;i<15;i++) {
+    const t = document.createElement("div");
+    t.className = "tile";
+    t.textContent = i===Math.floor(Math.random()*15) ? words[level] : "";
+    t.onclick = () => {
+      if (!t.textContent) return;
+      level++;
+      level<3 ? buildGrid() : revealPhoto();
+    };
+    grid.appendChild(t);
+  }
 }
 
 /* ======================
-   FINAL (PHOTO STAGE)
+   TIMER (NO HEARTS)
 ====================== */
-$("#toFinalBtn").addEventListener("click", () => showOnly(final));
+function startTimer() {
+  const TOTAL = 180000;
+  const start = Date.now();
+  const bar = $("#photoTimerBar");
 
-$("#photoCard").addEventListener("click", () => {
-  $("#photoCard").classList.toggle("flipped");
-});
+  const i = setInterval(() => {
+    const r = Math.max(0, TOTAL - (Date.now()-start));
+    bar.style.transform = `scaleX(${r/TOTAL})`;
+    if (r<=0) {
+      clearInterval(i);
+      showMsg($("#finalMsg"),"Time ran out.","error");
+    }
+  },200);
+}
 
 /* ======================
-   BOOT
+   SCRATCH
 ====================== */
-(async function boot() {
-  const ok = await validateToken();
-  if (!ok) {
-    showOnly(blocked);
-    return;
-  }
+function revealPhoto() {
+  $("#cardGrid").classList.add("hidden");
+  $("#photoStage").classList.remove("hidden");
 
-  showOnly(personal);
-})();
+  const c = $("#scratch");
+  const ctx = c.getContext("2d");
+  c.width = 360;
+  c.height = 240;
+
+  ctx.fillStyle = "#120717";
+  ctx.fillRect(0,0,c.width,c.height);
+
+  c.onmousemove = e => {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(e.offsetX,e.offsetY,18,0,Math.PI*2);
+    ctx.fill();
+  };
+}
