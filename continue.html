@@ -121,28 +121,33 @@
           <p id="rewardText" class="title hidden"></p>
 
           <!-- PHOTO CARD (LEVEL 3) -->
-          <div id="photoStage" class="hidden">
-            <p class="subtitle">
-              You found it.<br />
-              Flip the card… then scratch the back.
+          <section id="final" class="hidden">
+            <h2 class="title center">Last thing.</h2>
+            <p class="subtitle center">
+              You have 3 minutes.<br>
+              Find the correct card before time runs out.
             </p>
 
-            <div id="photoCard" class="photo-card">
-              <!-- front -->
-              <div class="card-front">
-                <img class="photo-img" src="/assets/cover.jpg" alt="cover" />
+            <p class="msg ok center" id="finalHint"></p>
+
+            <div class="photo-card" id="photoCard">
+              <!-- FRONT -->
+              <div class="card-front center">
+                Flip the card
               </div>
 
-              <!-- back -->
+              <!-- BACK -->
               <div class="card-back">
-                <canvas id="scratch"></canvas>
-                <div id="revealText">Scratch to reveal</div>
-                <img id="hiddenPhoto" class="photo-img" src="/assets/20251206_190038.jpg" alt="hidden" />
+                <canvas id="scratchCanvas"></canvas>
+                <img
+                  src="/assets/20251206_190038.jpg"
+                  alt="photo"
+                  class="photo-img"
+                />
+                <div class="scratch-label">Scratch to reveal</div>
               </div>
             </div>
-
-            <p id="finalMsg" class="msg"></p>
-          </div>
+          </section>
         </div>
       </section>
 

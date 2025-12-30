@@ -581,7 +581,7 @@ function onFoundCorrect() {
 }
 
 /* ======================
-   PHOTO CARD FLIP + SCRATCH
+   PHOTO CARD FLIP 
 ====================== */
 const photoCard = $("#photoCard");
 
@@ -590,62 +590,63 @@ photoCard.addEventListener("click", () => {
   photoCard.classList.toggle("flipped");
 });
 
-function setupPhotoCardAndScratch() {
-  const canvas = $("#scratch");
-  const revealText = $("#revealText");
-  const img = $("#hiddenPhoto");
+/* ======================
+   SCRATCH LOGIC (MOUSE + TOUCH)
+====================== */
+function setupScratch() {
+  const canvas = document.getElementById("scratch");
+  const ctx = canvas.getContext("2d");
+  const img = document.getElementById("hiddenPhoto");
 
-  // ensure image is visible under scratch layer
+  if (!canvas || !ctx || !img) return;
+
   img.style.display = "block";
 
-  // size canvas to card
-  const rect = canvas.getBoundingClientRect();
-  const w = Math.floor(rect.width);
-  const h = Math.floor(rect.height);
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
 
-  canvas.width = w;
-  canvas.height = h;
+    // cover layer
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "rgba(18,7,23,0.95)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const ctx = canvas.getContext("2d");
+    ctx.globalCompositeOperation = "destination-out";
+  }
 
-  // overlay paint
-  ctx.fillStyle = "rgba(18,7,23,0.95)";
-  ctx.fillRect(0, 0, w, h);
-
-  ctx.globalCompositeOperation = "destination-out";
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
 
   let scratching = false;
 
-  function scratchAt(x, y) {
-    ctx.beginPath();
-    ctx.arc(x, y, 18, 0, Math.PI * 2);
-    ctx.fill();
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: x - rect.left, y: y - rect.top };
   }
 
-  function getPos(e) {
-    const r = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return { x: clientX - r.left, y: clientY - r.top };
+  function scratch(e) {
+    const { x, y } = getPos(e);
+    ctx.beginPath();
+    ctx.arc(x, y, 22, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function start(e) {
     e.preventDefault();
     scratching = true;
-    revealText.style.display = "none";
-    const p = getPos(e);
-    scratchAt(p.x, p.y);
+    scratch(e);
   }
 
   function move(e) {
     if (!scratching) return;
     e.preventDefault();
-    const p = getPos(e);
-    scratchAt(p.x, p.y);
+    scratch(e);
   }
 
-  function end(e) {
-    e.preventDefault();
+  function end() {
     scratching = false;
   }
 
@@ -658,9 +659,8 @@ function setupPhotoCardAndScratch() {
   canvas.addEventListener("touchstart", start, { passive: false });
   canvas.addEventListener("touchmove", move, { passive: false });
   canvas.addEventListener("touchend", end, { passive: false });
-
-  showMsg($("#finalMsg"), "Flip it… then scratch the back.", "");
 }
+
 
 /* ======================
    BOOT
