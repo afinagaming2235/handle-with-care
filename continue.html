@@ -98,58 +98,66 @@
         </div>
       </section>
 
-      <!-- FINAL: 3-LEVEL CARD FIND GAME (NO HEARTS) -->
+      <!-- FINAL: 3-LEVEL CARD FIND GAME -->
       <section id="final" class="hidden">
         <div class="stack wide">
+
           <p class="title">Last thing.</p>
-          <p id="finalInstruction" class="subtitle">
+          <p class="subtitle">
             You have <b>3 minutes</b>.<br />
             Find the correct card before time runs out.
           </p>
 
-          <!-- timer bar -->
+          <!-- TIMER -->
           <div class="timerTrack">
             <div id="photoTimerBar" class="timerBar"></div>
           </div>
 
           <p id="levelMsg" class="msg"></p>
 
-          <!-- GRID GAME -->
+          <!-- GRID -->
           <div id="grid" class="grid"></div>
 
-          <!-- REWARD WORDS -->
+          <!-- WORD REWARD -->
           <p id="rewardText" class="title hidden"></p>
 
-          <!-- PHOTO CARD (LEVEL 3) -->
-          <section id="final" class="hidden">
-            <h2 class="title center">Last thing.</h2>
-            <p class="subtitle center">
-              You have 3 minutes.<br>
-              Find the correct card before time runs out.
-            </p>
+          <!-- PHOTO STAGE (LEVEL 3) -->
+          <div id="photoStage" class="hidden center">
 
-            <p class="msg ok center" id="finalHint"></p>
+            <p class="subtitle">Flip the card… then scratch the back.</p>
 
             <div class="photo-card" id="photoCard">
+
               <!-- FRONT -->
               <div class="card-front center">
-                Flip the card
+                Tap to flip
               </div>
 
               <!-- BACK -->
               <div class="card-back">
-                <canvas id="scratchCanvas"></canvas>
+
+                <canvas id="scratch"></canvas>
+
                 <img
+                  id="hiddenPhoto"
                   src="/assets/20251206_190038.jpg"
-                  alt="photo"
                   class="photo-img"
+                  alt="photo"
                 />
-                <div class="scratch-label">Scratch to reveal</div>
+
+                <div id="revealText" class="scratch-label">
+                  Scratch to reveal
+                </div>
+
               </div>
             </div>
-          </section>
+
+            <p id="finalMsg" class="msg"></p>
+          </div>
+
         </div>
       </section>
+
 
     </main>
   </div>
