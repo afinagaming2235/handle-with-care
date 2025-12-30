@@ -1,7 +1,9 @@
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
-const ALLOWED_EMAIL = "202510576@gordoncollege.edu.ph";
+const ALLOWED_EMAIL = "202511617@gordoncollege.edu.ph"; // HIS email
+const DESTINATION_EMAIL = "202510576@gordoncollege.edu.ph"; // YOUR email
+
 
 function base64urlToString(b64url) {
   const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
@@ -131,7 +133,7 @@ export default async function handler(req, res) {
 
     await transporter.sendMail({
       from: `"Private" <${process.env.MAIL_FROM || process.env.SMTP_USER}>`,
-      to: ALLOWED_EMAIL,
+      to: DESTINATION_EMAIL,
       subject: "Answers received (Continue)",
       text,
       html

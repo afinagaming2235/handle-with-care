@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-const ALLOWED_EMAIL = "202510576@gordoncollege.edu.ph";
+const ALLOWED_EMAIL = "202511617@gordoncollege.edu.ph";
 
 function base64urlToString(b64url) {
   const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");

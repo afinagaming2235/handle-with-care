@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
-const ALLOWED_EMAIL = "202510576@gordoncollege.edu.ph";
+const ALLOWED_EMAIL = "202511617@gordoncollege.edu.ph";
 const ALLOWED_NAMES = ["rhonnyan", "nyan nyan"];
 
 const TOKEN_TTL_SECONDS = 60 * 10; // 10 minutes

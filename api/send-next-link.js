@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
-const EMAIL = "202510576@gordoncollege.edu.ph";
+const EMAIL = "202511617@gordoncollege.edu.ph";
 const TTL = 60 * 60; // 1 hour
 
 function base64url(input) {
