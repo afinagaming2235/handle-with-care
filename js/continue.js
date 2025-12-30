@@ -615,13 +615,13 @@ function setupPhotoCardAndScratch() {
 
   // Cover layer
   ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = "rgba(18,7,23,0.95)";
+  ctx.fillStyle = "rgb(12,5,18)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.globalCompositeOperation = "destination-out";
 
   let scratching = false;
-  const RADIUS = 22;
+  const RADIUS = 32;
 
   function scratch(x, y) {
     ctx.beginPath();

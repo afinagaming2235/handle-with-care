@@ -308,10 +308,13 @@ html, body {
 
 .card-front {
   background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-back {
-  position: relative;
+  position: absolute;
   transform: rotateY(180deg);
 }
 
@@ -327,6 +330,9 @@ html, body {
   position: absolute;
   inset: 0;
   z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ===== SCRATCH ===== */
@@ -336,12 +342,19 @@ html, body {
   z-index: 3;
   pointer-events: auto;
   touch-action: none; /* VERY IMPORTANT for mobile */
+  width: 100%;
+  height: 100%;
 }
 
 .scratch-label {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: rgba(18, 7, 23, 0.85);
   pointer-events: none;
 }
 
