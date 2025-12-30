@@ -26,7 +26,7 @@ btn.addEventListener("click", async () => {
     const data = await res.json();
 
     if (!data.ok) {
-      msg.textContent = "Something went wrong.";
+      msg.textContent = "Something went wrong. Use your student email";
       msg.classList.add("error");
       return;
     }

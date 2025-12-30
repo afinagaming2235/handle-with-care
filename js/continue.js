@@ -580,9 +580,7 @@ function onFoundCorrect() {
   setupPhotoCardAndScratch();
 }
 
-/* ======================
-   PHOTO CARD FLIP + SCRATCH
-====================== */
+
 /* ======================
    PHOTO CARD FLIP + SCRATCH
 ====================== */
@@ -590,7 +588,12 @@ const photoCard = $("#photoCard");
 
 photoCard.addEventListener("click", () => {
   if (photoExpired) return;
+
   photoCard.classList.toggle("flipped");
+
+  if (photoCard.classList.contains("flipped")) {
+    setTimeout(setupPhotoCardAndScratch, 300);
+  }
 });
 
 function setupPhotoCardAndScratch() {
